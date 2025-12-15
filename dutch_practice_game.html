@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dutch Practice Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #3b0764 0, #020617 45%, #000000 100%);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      color: #e5e7eb;
+    }
+    .app {
+      background: rgba(15, 23, 42, 0.95);
+      margin: 20px;
+      padding: 24px 20px;
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow:
+        0 0 25px rgba(168, 85, 247, 0.4),
+        0 20px 40px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 1.8rem;
+      color: #f9fafb;
+      text-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
+    }
+    .controls {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      align-items: center;
+      justify-content: center;
+    }
+    .controls-bottom {
+      margin-bottom: 20px;
+    }
+    .controls label {
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+    select, button, input[type="text"] {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 0.9rem;
+      outline: none;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.1s ease;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: #a855f7;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
+    }
+    button {
+      background: radial-gradient(circle at top left, #a855f7, #581c87);
+      color: #f9fafb;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
+    }
+    button:hover {
+      background: radial-gradient(circle at top left, #c084fc, #7e22ce);
+      box-shadow: 0 0 22px rgba(192, 132, 252, 0.9);
+      transform: translateY(-1px);
+    }
+    button:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
+    }
+    button:disabled {
+      background: rgba(75, 85, 99, 0.8);
+      box-shadow: none;
+      cursor: default;
+    }
+    #statusBar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      color: #cbd5f5;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #statusBar strong {
+      color: #a855f7;
+    }
+    #gameArea {
+      border-radius: 16px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      padding: 16px;
+      min-height: 180px;
+      background: radial-gradient(circle at top left, rgba(24, 24, 27, 0.95), rgba(15, 23, 42, 0.95));
+      box-shadow: inset 0 0 20px rgba(15, 23, 42, 0.9);
+    }
+    .prompt {
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+    .subprompt {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      color: #9ca3af;
+    }
+    .flashcard {
+      padding: 16px;
+      border-radius: 16px;
+      background: radial-gradient(circle at top, rgba(76, 29, 149, 0.6), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(167, 139, 250, 0.6);
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.7);
+    }
+    .flashcard small {
+      color: #e5e7eb;
+      display: block;
+      margin-bottom: 6px;
+      opacity: 0.8;
+    }
+    .flash-question {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #f9fafb;
+    }
+    .flash-answer {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #bbf7d0;
+    }
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .choice-btn {
+      border-radius: 12px;
+      padding: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+    }
+    .choice-btn:hover {
+      background: rgba(30, 64, 175, 0.6);
+      box-shadow: 0 0 16px rgba(129, 140, 248, 0.8);
+      border-color: #4f46e5;
+      transform: translateY(-1px);
+    }
+    .choice-btn.correct {
+      background: rgba(22, 101, 52, 0.9);
+      border-color: #22c55e;
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
+    }
+    .choice-btn.wrong {
+      background: rgba(127, 29, 29, 0.9);
+      border-color: #f97373;
+      box-shadow: 0 0 16px rgba(248, 113, 113, 0.8);
+    }
+    #feedback {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      min-height: 1.2em;
+    }
+    #feedback.ok {
+      color: #4ade80;
+      text-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+    }
+    #feedback.bad {
+      color: #fca5a5;
+      text-shadow: 0 0 6px rgba(248, 113, 113, 0.7);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .row input[type="text"] {
+      flex: 1;
+      min-width: 160px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(126, 34, 206, 0.25);
+      font-size: 0.75rem;
+      margin-left: 4px;
+      color: #e9d5ff;
+      border: 1px solid rgba(192, 132, 252, 0.6);
+      box-shadow: 0 0 10px rgba(192, 132, 252, 0.7);
+    }
+    .hint-text {
+      font-size: 0.85rem;
+      color: #a5b4fc;
+      opacity: 0.9;
+    }
+    .hint-btn {
+      padding-inline: 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(129, 140, 248, 0.8);
+      background: radial-gradient(circle at top left, #4f46e5, #1d1b4b);
+      font-size: 0.8rem;
+      box-shadow: 0 0 12px rgba(129, 140, 248, 0.8);
+    }
+    .hint-btn:hover {
+      background: radial-gradient(circle at top left, #818cf8, #312e81);
+      box-shadow: 0 0 18px rgba(129, 140, 248, 1);
+    }
+    .next-btn {
+      padding-inline: 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(251, 191, 36, 0.9);
+      background: radial-gradient(circle at top left, #fbbf24, #92400e);
+      font-size: 0.8rem;
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+    }
+    .next-btn:hover {
+      background: radial-gradient(circle at top left, #facc15, #b45309);
+      box-shadow: 0 0 18px rgba(250, 204, 21, 1);
+    }
+    .hint-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .hint-popup-box {
+      background: rgba(15, 23, 42, 0.97);
+      border-radius: 16px;
+      padding: 20px 24px;
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid rgba(168, 85, 247, 0.8);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.9);
+    }
+    .hint-popup-box h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: #f9fafb;
+    }
+    .hint-popup-box p {
+      font-size: 0.9rem;
+      color: #e5e7eb;
+      margin-bottom: 16px;
+    }
+    .hint-popup-box button {
+      min-width: 90px;
+    }
+    @media (max-width: 640px) {
+      .app {
+        margin: 10px;
+        padding: 16px 12px;
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Dutch Practice Games</h1>
+
+    <div id="statusBar">
+      <div>
+        Score: <strong id="score">0</strong> /
+        <span id="questions">0</span>
+        · Wrong: <strong id="wrong">0</strong>
+        · Streak: <strong id="streak">0</strong>
+        · Best: <strong id="bestStreak">0</strong>
+      </div>
+      <div>Current category: <span id="currentCategory">All</span></div>
+    </div>
+
+    <div class="controls controls-bottom">
+      <label>
+        Direction:
+        <select id="directionSelect">
+          <option value="nl-id">Dutch → Indonesian</option>
+          <option value="id-nl">Indonesian → Dutch</option>
+        </select>
+      </label>
+      <label>
+        Mode:
+        <select id="modeSelect">
+          <option value="flashcard">Flashcards</option>
+          <option value="multiple">Multiple Choice</option>
+          <option value="typing">Type the Answer</option>
+        </select>
+      </label>
+      <label>
+        Category:
+        <select id="categorySelect"></select>
+      </label>
+      <button id="startBtn" type="button">Start / Next</button>
+      <button id="resetBtn" type="button">Reset Stats</button>
+    </div>
+
+    <div id="gameArea">
+      <p>Select a mode and category, then press <strong>Start / Next</strong>.</p>
+    </div>
+    <div id="feedback"></div>
+
+    <div id="hintPopup" class="hint-popup-overlay">
+      <div class="hint-popup-box">
+        <h2>Hint used</h2>
+        <p>Using a hint will reduce your score by 1 point for this question.</p>
+        <button id="hintPopupBtn" type="button">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ===== DATA =====
+  const vocabData = [
+    // Daily routine
+    { dutch: "opstaan", meaning: "bangun / to get up", example: "Ik sta om 7 uur op.", category: "Daily routine" },
+    { dutch: "aandoen", meaning: "menyalakan / to turn on, to put on", example: "Ik doe de lamp aan.", category: "Daily routine" },
+    { dutch: "meenemen", meaning: "membawa ikut / to take along", example: "Ik neem mijn boek mee.", category: "Daily routine" },
+    { dutch: "opruimen", meaning: "merapikan / to tidy up", example: "Ik ruim mijn kamer op.", category: "Daily routine" },
+    { dutch: "slapen", meaning: "tidur / to sleep", example: "Ik ga om 11 uur slapen.", category: "Daily routine" },
+
+    // Time words
+    { dutch: "eerst", meaning: "first", example: "Eerst eet ik ontbijt.", category: "Time words" },
+    { dutch: "daarna", meaning: "kemudian / then", example: "Daarna ga ik werken.", category: "Time words" },
+    { dutch: "ten slotte", meaning: "akhirnya / finally", example: "Ten slotte ga ik slapen.", category: "Time words" },
+    { dutch: "straks", meaning: "nanti / later", example: "Ik ga straks koken.", category: "Time words" },
+
+    // Feelings & opinions
+    { dutch: "niet zo leuk", meaning: "so-so / not so nice", example: "De film was niet zo leuk.", category: "Feelings & opinions" },
+    { dutch: "spannend", meaning: "tegang / exciting", example: "De film was heel spannend.", category: "Feelings & opinions" },
+
+    // People & family
+    { dutch: "gasten", meaning: "tamu / guests", example: "We krijgen vanavond gasten.", category: "People & family" },
+    { dutch: "schoonmoeder", meaning: "mother-in-law", example: "Mijn schoonmoeder woont in Nederland.", category: "People & family" },
+
+    // Body & looks
+    { dutch: "buikpijn", meaning: "sakit perut / stomach ache", example: "Ik heb buikpijn.", category: "Body & looks" },
+    { dutch: "keelpijn", meaning: "sakit tenggorokan / sore throat", example: "Ik heb keelpijn.", category: "Body & looks" },
+    { dutch: "rimpels", meaning: "keriput / wrinkles", example: "Oma heeft rimpels.", category: "Body & looks" },
+    { dutch: "kaal", meaning: "botak / bald", example: "Hij is kaal.", category: "Body & looks" },
+
+    // Transport & directions
+    { dutch: "verkeer", meaning: "lalu lintas / traffic", example: "Het verkeer is druk.", category: "Transport & directions" },
+    { dutch: "rechts", meaning: "kanan / right", example: "Ga rechts bij het kruispunt.", category: "Transport & directions" },
+    { dutch: "links", meaning: "kiri / left", example: "Sla linksaf.", category: "Transport & directions" },
+    { dutch: "rechtdoor", meaning: "lurus / straight ahead", example: "Rij rechtdoor tot de rotonde.", category: "Transport & directions" },
+
+    // Extra
+    { dutch: "het hangt af van", meaning: "it depends on", example: "Het hangt af van mijn mood.", category: "Extra" },
+    { dutch: "verjaardag", meaning: "ulang tahun / birthday", example: "Ik ben jarig vandaag.", category: "Extra" },
+
+    // Doctor & health
+    { dutch: "klachten", meaning: "masalah / gejala", example: "Ik heb klachten aan mijn rug.", category: "Doctor & health" },
+    { dutch: "spreekuur", meaning: "konsultasi dokter", example: "Het spreekuur begint om 9 uur.", category: "Doctor & health" },
+    { dutch: "nog steeds", meaning: "masih / still", example: "Ik ben nog steeds moe.", category: "Doctor & health" },
+
+    // Weather
+    { dutch: "het is zonnig", meaning: "cerah sekarang", example: "Vandaag is het zonnig.", category: "Weather" },
+    { dutch: "het regent", meaning: "sedang hujan", example: "Het regent nu.", category: "Weather" },
+
+    // October words (sample)
+    { dutch: "zin", meaning: "keinginan", example: "Ik heb zin in koffie.", category: "October words" },
+    { dutch: "misselijk", meaning: "mual", example: "Ik ben misselijk.", category: "October words" },
+    { dutch: "verkouden", meaning: "batuk pilek", example: "Ik ben verkouden.", category: "October words" },
+
+    // Extra words
+    { dutch: "bagage", meaning: "barang bawaan", example: "Mijn bagage is zwaar.", category: "Extra words" },
+    { dutch: "uitgaan", meaning: "keluar", example: "We gaan vanavond uit.", category: "Extra words" },
+  ];
+
+  let currentMode = "flashcard";
+  let currentCategory = "All";
+  let currentIndex = 0;
+  let filtered = [];
+  let score = 0;
+  let questions = 0;
+  let wrong = 0;
+  let streak = 0;
+  let bestStreak = 0;
+  let lock = false;
+
+  const gameArea = document.getElementById("gameArea");
+  const scoreEl = document.getElementById("score");
+  const qEl = document.getElementById("questions");
+  const wrongEl = document.getElementById("wrong");
+  const streakEl = document.getElementById("streak");
+  const bestStreakEl = document.getElementById("bestStreak");
+  const feedbackEl = document.getElementById("feedback");
+  const currCatEl = document.getElementById("currentCategory");
+  const directionSelect = document.getElementById("directionSelect");
+  const modeSelect = document.getElementById("modeSelect");
+  const categorySelect = document.getElementById("categorySelect");
+  const startBtn = document.getElementById("startBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const hintPopup = document.getElementById("hintPopup");
+  const hintPopupBtn = document.getElementById("hintPopupBtn");
+
+  function showHintPopup() {
+    if (!hintPopup) return;
+    hintPopup.style.display = "flex";
+  }
+
+  if (hintPopupBtn) {
+    hintPopupBtn.addEventListener("click", () => {
+      hintPopup.style.display = "none";
+    });
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  function initCategories() {
+    const cats = new Set(vocabData.map(v => v.category));
+    const sorted = Array.from(cats).sort();
+    categorySelect.innerHTML = "";
+    const allOpt = document.createElement("option");
+    allOpt.value = "All";
+    allOpt.textContent = "All";
+    categorySelect.appendChild(allOpt);
+    sorted.forEach(cat => {
+      const opt = document.createElement("option");
+      opt.value = cat;
+      opt.textContent = cat;
+      categorySelect.appendChild(opt);
+    });
+    categorySelect.value = "All";
+    currCatEl.textContent = "All";
+  }
+
+  function updateFiltered() {
+    const cat = categorySelect.value || "All";
+    currentCategory = cat;
+    if (cat === "All") {
+      filtered = [...vocabData];
+    } else {
+      filtered = vocabData.filter(v => v.category === cat);
+    }
+    shuffle(filtered);
+    currentIndex = 0;
+    currCatEl.textContent = cat;
+  }
+
+  function nextItem() {
+    lock = false;
+    feedbackEl.textContent = "";
+    feedbackEl.className = "";
+
+    if (!filtered.length) {
+      updateFiltered();
+    }
+    if (!filtered.length) {
+      gameArea.innerHTML = "<p>No items in this category yet.</p>";
+      return;
+    }
+
+    if (currentIndex >= filtered.length) {
+      shuffle(filtered);
+      currentIndex = 0;
+    }
+    const item = filtered[currentIndex++];
+
+    if (currentMode === "flashcard") {
+      renderFlashcard(item);
+    } else if (currentMode === "multiple") {
+      renderMultipleChoice(item, currentIndex - 1);
+    } else {
+      renderTyping(item);
+    }
+  }
+
+  function renderFlashcard(item) {
+    const direction = directionSelect.value;
+    gameArea.innerHTML = "";
+    const card = document.createElement("div");
+    card.className = "flashcard";
+
+    const tag = document.createElement("small");
+    tag.innerHTML = `Category: <span class="tag">${item.category}</span>`;
+    card.appendChild(tag);
+
+    const qDiv = document.createElement("div");
+    qDiv.className = "flash-question";
+    const aDiv = document.createElement("div");
+    aDiv.className = "flash-answer";
+
+    if (direction === "nl-id") {
+      qDiv.textContent = item.dutch;
+      aDiv.textContent = `${item.meaning} ${item.example ? " · " + item.example : ""}`;
+    } else {
+      const indo = item.meaning.split("/")[0].trim();
+      qDiv.textContent = indo;
+      aDiv.textContent = `${item.dutch} ${item.example ? " · " + item.example : ""}`;
+    }
+    aDiv.style.display = "none";
+
+    const sub = document.createElement("div");
+    sub.className = "subprompt";
+    sub.textContent = "Klik untuk zien / melihat jawaban.";
+
+    card.appendChild(qDiv);
+    card.appendChild(sub);
+    card.appendChild(aDiv);
+
+    let flipped = false;
+    card.addEventListener("click", () => {
+      flipped = !flipped;
+      aDiv.style.display = flipped ? "block" : "none";
+    });
+
+    gameArea.appendChild(card);
+  }
+
+  function renderMultipleChoice(item, idxInFiltered) {
+    const direction = directionSelect.value;
+    gameArea.innerHTML = "";
+    lock = false;
+
+    const prompt = document.createElement("div");
+    prompt.className = "prompt";
+    if (direction === "nl-id") {
+      prompt.textContent = `Wat betekent: "${item.dutch}"?`;
+    } else {
+      const indo = item.meaning.split("/")[0].trim();
+      prompt.textContent = `Apa arti kata: "${indo}"? (dalam bahasa Belanda)`;
+    }
+    gameArea.appendChild(prompt);
+
+    const sub = document.createElement("div");
+    sub.className = "subprompt";
+    sub.textContent = direction === "nl-id"
+      ? "Pilih arti dalam bahasa Indonesia / Inggris."
+      : "Pilih kata yang benar dalam bahasa Belanda.";
+    gameArea.appendChild(sub);
+
+    const hintRow = document.createElement("div");
+    hintRow.className = "row";
+    const hintBtn = document.createElement("button");
+    hintBtn.type = "button";
+    hintBtn.textContent = "Hint";
+    hintBtn.classList.add("hint-btn");
+    const nextBtn = document.createElement("button");
+    nextBtn.type = "button";
+    nextBtn.textContent = "Next";
+    nextBtn.classList.add("next-btn");
+    nextBtn.style.display = "none";
+    const hintText = document.createElement("div");
+    hintText.className = "hint-text";
+    hintText.textContent = "";
+    let hintLevel = 0;
+    let hintPenaltyApplied = false;
+
+    hintRow.appendChild(hintBtn);
+    hintRow.appendChild(nextBtn);
+    hintRow.appendChild(hintText);
+    gameArea.appendChild(hintRow);
+
+    const choicesDiv = document.createElement("div");
+    choicesDiv.className = "choices";
+
+    hintBtn.addEventListener("click", () => {
+      hintLevel++;
+      if (!hintPenaltyApplied) {
+        showHintPopup();
+        if (score > 0) {
+          score--;
+          scoreEl.textContent = score;
+        }
+        hintPenaltyApplied = true;
+      }
+
+      if (hintLevel === 1) {
+        if (direction === "nl-id") {
+          const indo = item.meaning.split("/")[0].trim();
+          const hangman = indo
+            .split(" ")
+            .map(word =>
+              word
+                .split("")
+                .map((ch, idx) => (idx === 0 ? ch : "_"))
+                .join(" ")
+            )
+            .join("   ");
+          hintText.textContent = `Clue: ${hangman}`;
+        } else {
+          const w = item.dutch.trim();
+          const hangman = w
+            .split(" ")
+            .map(word =>
+              word
+                .split("")
+                .map((ch, idx, arr) => (idx === 0 || idx === arr.length - 1) ? ch : "_")
+                .join(" ")
+            )
+            .join("   ");
+          hintText.textContent = `Clue: ${hangman}`;
+        }
+      } else {
+        if (item.example && item.example.trim() !== "") {
+          hintText.textContent = `Voorbeeld: ${item.example}`;
+        } else {
+          hintText.textContent = "Geen voorbeeldzin beschikbaar.";
+        }
+      }
+    });
+
+    const others = filtered
+      .filter((_, i) => i !== idxInFiltered)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, Math.min(3, Math.max(0, filtered.length - 1)));
+    const options = [item, ...others];
+    shuffle(options);
+
+    const correctText = direction === "nl-id" ? item.meaning : item.dutch;
+
+    options.forEach(optItem => {
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.textContent = direction === "nl-id" ? optItem.meaning : optItem.dutch;
+
+      btn.addEventListener("click", () => {
+        if (lock) return;
+        lock = true;
+        questions++;
+        qEl.textContent = questions;
+
+        const allBtns = choicesDiv.querySelectorAll("button");
+        allBtns.forEach(b => {
+          if (b.textContent === correctText) {
+            b.classList.add("correct");
+          }
+        });
+
+        const isCorrect = btn.textContent === correctText;
+
+        if (isCorrect) {
+          score++;
+          scoreEl.textContent = score;
+          streak++;
+          if (streak > bestStreak) bestStreak = streak;
+          streakEl.textContent = streak;
+          bestStreakEl.textContent = bestStreak;
+
+          feedbackEl.textContent = direction === "nl-id"
+            ? `✅ Goed! Voorbeeld: ${item.example || "—"}`
+            : `✅ Klopt! ${item.dutch} = ${item.meaning}.`;
+          feedbackEl.className = "ok";
+
+          setTimeout(() => {
+            nextItem();
+          }, 2000);
+        } else {
+          wrong++;
+          wrongEl.textContent = wrong;
+          streak = 0;
+          streakEl.textContent = streak;
+          btn.classList.add("wrong");
+          feedbackEl.textContent = direction === "nl-id"
+            ? `❌ Bukan. Jawaban benar: ${item.meaning}`
+            : `❌ Niet goed. Jawaban benar: ${item.dutch}`;
+          feedbackEl.className = "bad";
+
+          alert(
+            direction === "nl-id"
+              ? `Jawaban benar: ${item.meaning}
+Contoh: ${item.example || "—"}`
+              : `Correct answer: ${item.dutch}
+Meaning: ${item.meaning}
+Example: ${item.example || "—"}`
+          );
+
+          nextBtn.style.display = "inline-block";
+          nextBtn.onclick = () => {
+            nextItem();
+          };
+        }
+      });
+
+      choicesDiv.appendChild(btn);
+    });
+
+    gameArea.appendChild(choicesDiv);
+  }
+
+  function renderTyping(item) {
+    const direction = directionSelect.value;
+    gameArea.innerHTML = "";
+    lock = false;
+
+    const prompt = document.createElement("div");
+    prompt.className = "prompt";
+    if (direction === "nl-id") {
+      prompt.textContent = `Tulis arti dari: "${item.dutch}"`;
+    } else {
+      const indo = item.meaning.split("/")[0].trim();
+      prompt.textContent = `Tulis kata Belanda dari: "${indo}"`;
+    }
+    gameArea.appendChild(prompt);
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = direction === "nl-id"
+      ? "Tulis artinya di sini..."
+      : "Tulis kata Belanda di sini...";
+    row.appendChild(input);
+
+    const checkBtn = document.createElement("button");
+    checkBtn.textContent = "Check";
+    row.appendChild(checkBtn);
+
+    const hintBtn = document.createElement("button");
+    hintBtn.textContent = "Hint";
+    hintBtn.type = "button";
+    hintBtn.classList.add("hint-btn");
+    row.appendChild(hintBtn);
+
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next";
+    nextBtn.type = "button";
+    nextBtn.classList.add("next-btn");
+    nextBtn.style.display = "none";
+    row.appendChild(nextBtn);
+
+    gameArea.appendChild(row);
+
+    const hintText = document.createElement("div");
+    hintText.className = "hint-text";
+    hintText.textContent = "";
+    let hintLevel = 0;
+    let hintPenaltyApplied = false;
+    gameArea.appendChild(hintText);
+
+    hintBtn.addEventListener("click", () => {
+      hintLevel++;
+      if (!hintPenaltyApplied) {
+        showHintPopup();
+        if (score > 0) {
+          score--;
+          scoreEl.textContent = score;
+        }
+        hintPenaltyApplied = true;
+      }
+
+      if (hintLevel === 1) {
+        if (direction === "nl-id") {
+          const indo = item.meaning.split("/")[0].trim();
+          const hangman = indo
+            .split(" ")
+            .map(word =>
+              word
+                .split("")
+                .map((ch, idx) => (idx === 0 ? ch : "_"))
+                .join(" ")
+            )
+            .join("   ");
+          hintText.textContent = `Clue: ${hangman}`;
+        } else {
+          const w = item.dutch.trim();
+          const hangman = w
+            .split(" ")
+            .map(word =>
+              word
+                .split("")
+                .map((ch, idx, arr) => (idx === 0 || idx === arr.length - 1) ? ch : "_")
+                .join(" ")
+            )
+            .join("   ");
+          hintText.textContent = `Clue: ${hangman}`;
+        }
+      } else {
+        if (item.example && item.example.trim() !== "") {
+          hintText.textContent = `Voorbeeld: ${item.example}`;
+        } else {
+          hintText.textContent = "Geen voorbeeldzin beschikbaar.";
+        }
+      }
+    });
+
+    checkBtn.addEventListener("click", () => {
+      if (lock) return;
+      const userRaw = input.value.trim();
+      if (!userRaw) return;
+      const user = userRaw.toLowerCase();
+
+      questions++;
+      qEl.textContent = questions;
+
+      let isCorrect = false;
+      if (direction === "nl-id") {
+        const raw = item.meaning.toLowerCase();
+        const parts = raw.split("/").map(p => p.trim()).filter(Boolean);
+        isCorrect = parts.some(p => user === p || p.includes(user) || user.includes(p));
+      } else {
+        const target = item.dutch.toLowerCase();
+        isCorrect = user === target;
+      }
+
+      if (isCorrect) {
+        score++;
+        scoreEl.textContent = score;
+        streak++;
+        if (streak > bestStreak) bestStreak = streak;
+        streakEl.textContent = streak;
+        bestStreakEl.textContent = bestStreak;
+
+        if (direction === "nl-id") {
+          feedbackEl.textContent = `✅ Yes! ${item.dutch} = ${item.meaning}. Voorbeeld: ${item.example || "—"}`;
+        } else {
+          const indo = item.meaning.split("/")[0].trim();
+          feedbackEl.textContent = `✅ Goed! "${indo}" = ${item.dutch}. Voorbeeld: ${item.example || "—"}`;
+        }
+        feedbackEl.className = "ok";
+
+        setTimeout(() => {
+          nextItem();
+        }, 2000);
+      } else {
+        wrong++;
+        wrongEl.textContent = wrong;
+        streak = 0;
+        streakEl.textContent = streak;
+
+        if (direction === "nl-id") {
+          feedbackEl.textContent = `❌ ${item.dutch} = ${item.meaning}.`;
+          alert(`Juiste antwoord: ${item.dutch} = ${item.meaning}
+Voorbeeld: ${item.example || "—"}`);
+        } else {
+          const indo = item.meaning.split("/")[0].trim();
+          feedbackEl.textContent = `❌ "${indo}" = ${item.dutch}.`;
+          alert(`Correct answer: ${item.dutch}
+Meaning: ${item.meaning}
+Example: ${item.example || "—"}`);
+        }
+
+        feedbackEl.className = "bad";
+        nextBtn.style.display = "inline-block";
+        nextBtn.onclick = () => {
+          nextItem();
+        };
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        checkBtn.click();
+      }
+    });
+  }
+
+  modeSelect.addEventListener("change", () => {
+    currentMode = modeSelect.value;
+    feedbackEl.textContent = "";
+    feedbackEl.className = "";
+    gameArea.innerHTML = '<p>Press <strong>Start / Next</strong> to begin this mode.</p>';
+  });
+
+  categorySelect.addEventListener("change", () => {
+    updateFiltered();
+    feedbackEl.textContent = "";
+    feedbackEl.className = "";
+    gameArea.innerHTML = '<p>Category changed. Press <strong>Start / Next</strong>.</p>';
+  });
+
+  directionSelect.addEventListener("change", () => {
+    feedbackEl.textContent = "";
+    feedbackEl.className = "";
+    gameArea.innerHTML = '<p>Direction changed. Press <strong>Start / Next</strong>.</p>';
+  });
+
+  startBtn.addEventListener("click", () => {
+    if (!filtered.length) {
+      updateFiltered();
+    }
+    nextItem();
+  });
+
+  resetBtn.addEventListener("click", () => {
+    score = 0;
+    questions = 0;
+    wrong = 0;
+    streak = 0;
+    bestStreak = 0;
+    scoreEl.textContent = "0";
+    qEl.textContent = "0";
+    wrongEl.textContent = "0";
+    streakEl.textContent = "0";
+    bestStreakEl.textContent = "0";
+    feedbackEl.textContent = "";
+    feedbackEl.className = "";
+    gameArea.innerHTML = '<p>Stats reset. Press <strong>Start / Next</strong> to play again.</p>';
+  });
+
+  initCategories();
+  updateFiltered();
+  scoreEl.textContent = score;
+  qEl.textContent = questions;
+  wrongEl.textContent = wrong;
+  streakEl.textContent = streak;
+  bestStreakEl.textContent = bestStreak;
+</script>
