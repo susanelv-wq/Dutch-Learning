@@ -942,3 +942,13 @@ Example: ${item.example || "—"}`);
   streakEl.textContent = streak;
   bestStreakEl.textContent = bestStreak;
 </script>
+<script>
+  if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/Dutch-Learning/sw.js')
+              .catch(err => console.warn('SW registration failed:', err));
+      });
+  }
+    </script>
+</body>
+</html>
