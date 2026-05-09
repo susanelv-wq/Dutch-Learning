@@ -1,954 +1,2136 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dutch Practice Games</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="manifest" href="manifest.json" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      <meta name="apple-mobile-web-app-title" content="Dutch Games" />
-      <meta name="theme-color" content="#3b0764" />
-      <link rel="apple-touch-icon" href="icon-192.png" />
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #3b0764 0, #020617 45%, #000000 100%);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      color: #e5e7eb;
-    }
-    .app {
-      background: rgba(15, 23, 42, 0.95);
-      margin: 20px;
-      padding: 24px 20px;
-      border-radius: 20px;
-      max-width: 900px;
-      width: 100%;
-      box-shadow:
-        0 0 25px rgba(168, 85, 247, 0.4),
-        0 20px 40px rgba(0, 0, 0, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      backdrop-filter: blur(10px);
-    }
-    h1 {
-      margin-top: 0;
-      text-align: center;
-      font-size: 1.8rem;
-      color: #f9fafb;
-      text-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
-    }
-    .controls {
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 16px;
-      align-items: center;
-      justify-content: center;
-    }
-    .controls-bottom {
-      margin-bottom: 20px;
-    }
-    .controls label {
-      font-size: 0.9rem;
-      color: #e5e7eb;
-    }
-    select, button, input[type="text"] {
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      font-size: 0.9rem;
-      outline: none;
-      background: rgba(15, 23, 42, 0.9);
-      color: #e5e7eb;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.1s ease;
-    }
-    select:focus, input[type="text"]:focus {
-      border-color: #a855f7;
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
-    }
-    button {
-      background: radial-gradient(circle at top left, #a855f7, #581c87);
-      color: #f9fafb;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
-    }
-    button:hover {
-      background: radial-gradient(circle at top left, #c084fc, #7e22ce);
-      box-shadow: 0 0 22px rgba(192, 132, 252, 0.9);
-      transform: translateY(-1px);
-    }
-    button:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
-    }
-    button:disabled {
-      background: rgba(75, 85, 99, 0.8);
-      box-shadow: none;
-      cursor: default;
-    }
-    #statusBar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-      color: #cbd5f5;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    #statusBar strong {
-      color: #a855f7;
-    }
-    #gameArea {
-      border-radius: 16px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      padding: 16px;
-      min-height: 180px;
-      background: radial-gradient(circle at top left, rgba(24, 24, 27, 0.95), rgba(15, 23, 42, 0.95));
-      box-shadow: inset 0 0 20px rgba(15, 23, 42, 0.9);
-    }
-    .prompt {
-      font-size: 1.3rem;
-      margin-bottom: 12px;
-      font-weight: 600;
-      color: #f9fafb;
-    }
-    .subprompt {
-      font-size: 0.95rem;
-      margin-bottom: 12px;
-      color: #9ca3af;
-    }
-    .flashcard {
-      padding: 16px;
-      border-radius: 16px;
-      background: radial-gradient(circle at top, rgba(76, 29, 149, 0.6), rgba(15, 23, 42, 0.95));
-      border: 1px solid rgba(167, 139, 250, 0.6);
-      cursor: pointer;
-      text-align: center;
-      box-shadow: 0 0 18px rgba(168, 85, 247, 0.7);
-    }
-    .flashcard small {
-      color: #e5e7eb;
-      display: block;
-      margin-bottom: 6px;
-      opacity: 0.8;
-    }
-    .flash-question {
-      font-size: 1.2rem;
-      margin-bottom: 8px;
-      color: #f9fafb;
-    }
-    .flash-answer {
-      margin-top: 10px;
-      font-size: 1rem;
-      color: #bbf7d0;
-    }
-    .choices {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .choice-btn {
-      border-radius: 12px;
-      padding: 10px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      background: rgba(15, 23, 42, 0.95);
-      cursor: pointer;
-      text-align: left;
-      font-size: 0.9rem;
-      color: #e5e7eb;
-      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
-    }
-    .choice-btn:hover {
-      background: rgba(30, 64, 175, 0.6);
-      box-shadow: 0 0 16px rgba(129, 140, 248, 0.8);
-      border-color: #4f46e5;
-      transform: translateY(-1px);
-    }
-    .choice-btn.correct {
-      background: rgba(22, 101, 52, 0.9);
-      border-color: #22c55e;
-      box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
-    }
-    .choice-btn.wrong {
-      background: rgba(127, 29, 29, 0.9);
-      border-color: #f97373;
-      box-shadow: 0 0 16px rgba(248, 113, 113, 0.8);
-    }
-    #feedback {
-      margin-top: 10px;
-      font-size: 0.95rem;
-      min-height: 1.2em;
-    }
-    #feedback.ok {
-      color: #4ade80;
-      text-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
-    }
-    #feedback.bad {
-      color: #fca5a5;
-      text-shadow: 0 0 6px rgba(248, 113, 113, 0.7);
-    }
-    .row {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .row input[type="text"] {
-      flex: 1;
-      min-width: 160px;
-    }
-    .tag {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(126, 34, 206, 0.25);
-      font-size: 0.75rem;
-      margin-left: 4px;
-      color: #e9d5ff;
-      border: 1px solid rgba(192, 132, 252, 0.6);
-      box-shadow: 0 0 10px rgba(192, 132, 252, 0.7);
-    }
-    .hint-text {
-      font-size: 0.85rem;
-      color: #a5b4fc;
-      opacity: 0.9;
-    }
-    .hint-btn {
-      padding-inline: 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(129, 140, 248, 0.8);
-      background: radial-gradient(circle at top left, #4f46e5, #1d1b4b);
-      font-size: 0.8rem;
-      box-shadow: 0 0 12px rgba(129, 140, 248, 0.8);
-    }
-    .hint-btn:hover {
-      background: radial-gradient(circle at top left, #818cf8, #312e81);
-      box-shadow: 0 0 18px rgba(129, 140, 248, 1);
-    }
-    .next-btn {
-      padding-inline: 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(251, 191, 36, 0.9);
-      background: radial-gradient(circle at top left, #fbbf24, #92400e);
-      font-size: 0.8rem;
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
-    }
-    .next-btn:hover {
-      background: radial-gradient(circle at top left, #facc15, #b45309);
-      box-shadow: 0 0 18px rgba(250, 204, 21, 1);
-    }
-    .hint-popup-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-    .hint-popup-box {
-      background: rgba(15, 23, 42, 0.97);
-      border-radius: 16px;
-      padding: 20px 24px;
-      max-width: 320px;
-      width: 90%;
-      text-align: center;
-      border: 1px solid rgba(168, 85, 247, 0.8);
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.9);
-    }
-    .hint-popup-box h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-size: 1.1rem;
-      color: #f9fafb;
-    }
-    .hint-popup-box p {
-      font-size: 0.9rem;
-      color: #e5e7eb;
-      margin-bottom: 16px;
-    }
-    .hint-popup-box button {
-      min-width: 90px;
-    }
-    @media (max-width: 640px) {
-      .app {
-        margin: 10px;
-        padding: 16px 12px;
-      }
-      h1 {
-        font-size: 1.4rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#5B3FFF" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="BelandaKu" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>BelandaKu — Belajar Bahasa Belanda</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%235B3FFF'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='white' font-family='system-ui'%3EB%3C/text%3E%3C/svg%3E" />
+<style>
+  /* ============================================================
+     BelandaKu — Dutch ↔ Indonesian Quizlet-style learning app
+     ============================================================ */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  :root{
+    --primary:#5B3FFF;
+    --primary-dark:#4129E0;
+    --primary-light:#EEEAFF;
+    --accent:#FFB800;
+    --accent-dark:#E09F00;
+    --success:#10B981;
+    --success-light:#D1FAE5;
+    --danger:#EF4444;
+    --danger-light:#FEE2E2;
+    --bg:#F7F7FB;
+    --surface:#FFFFFF;
+    --surface-2:#F0F0F7;
+    --text:#0F0F23;
+    --text-muted:#6B6B85;
+    --border:#E5E5EE;
+    --shadow:0 4px 14px rgba(91,63,255,.08);
+    --shadow-lg:0 10px 30px rgba(15,15,35,.12);
+    --radius:18px;
+    --radius-sm:12px;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  [data-theme="dark"]{
+    --primary:#7C66FF;
+    --primary-dark:#5B3FFF;
+    --primary-light:#2A2350;
+    --bg:#0B0B1F;
+    --surface:#16162E;
+    --surface-2:#1F1F3D;
+    --text:#F0F0FA;
+    --text-muted:#9696B8;
+    --border:#2A2A48;
+    --success-light:#0E3A2E;
+    --danger-light:#3A1414;
+    --shadow:0 4px 14px rgba(0,0,0,.4);
+    --shadow-lg:0 10px 30px rgba(0,0,0,.5);
+  }
+  html,body{height:100%;overscroll-behavior:none}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);color:var(--text);
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+    padding-top:var(--safe-top);padding-bottom:var(--safe-bottom);
+    overflow-x:hidden;
+  }
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;outline:none}
+  input,textarea{font:inherit;color:inherit}
+  img{max-width:100%;display:block}
+
+  /* App shell */
+  #app{max-width:520px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:24px}
+
+  /* Top bar */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;position:sticky;top:0;background:var(--bg);z-index:50;
+  }
+  .topbar h1{font-size:22px;font-weight:800;letter-spacing:-0.5px}
+  .topbar h1 .accent{color:var(--primary)}
+  .icon-btn{
+    width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
+    background:var(--surface);box-shadow:var(--shadow);font-size:18px;
+    transition:transform .15s;
+  }
+  .icon-btn:active{transform:scale(.92)}
+  .topbar-right{display:flex;gap:8px}
+
+  /* Hero stats */
+  .hero{
+    margin:6px 18px 18px;padding:18px 20px;border-radius:var(--radius);
+    background:linear-gradient(135deg,var(--primary) 0%,#7C66FF 100%);
+    color:white;box-shadow:var(--shadow-lg);
+    position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;top:-30px;right:-30px;
+    width:140px;height:140px;border-radius:50%;
+    background:rgba(255,255,255,.08);
+  }
+  .hero h2{font-size:13px;font-weight:600;opacity:.85;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+  .hero p.title{font-size:22px;font-weight:800;line-height:1.2}
+  .hero-stats{display:flex;gap:18px;margin-top:14px;position:relative;z-index:1}
+  .hero-stat{font-size:12px;opacity:.92}
+  .hero-stat strong{display:block;font-size:22px;font-weight:800;margin-bottom:2px}
+
+  /* Search */
+  .search-wrap{margin:0 18px 16px;position:relative}
+  .search-wrap input{
+    width:100%;padding:14px 16px 14px 46px;border:1.5px solid var(--border);
+    border-radius:14px;background:var(--surface);font-size:15px;
+  }
+  .search-wrap input:focus{border-color:var(--primary)}
+  .search-wrap::before{
+    content:"🔍";position:absolute;left:16px;top:50%;transform:translateY(-50%);
+    font-size:16px;opacity:.6;
+  }
+
+  /* Section title */
+  .section-title{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px;margin:18px 0 10px;font-size:15px;font-weight:700;
+  }
+  .section-title span.muted{font-weight:500;color:var(--text-muted);font-size:13px}
+
+  /* Deck grid */
+  .deck-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 18px;
+  }
+  .deck-card{
+    background:var(--surface);border-radius:var(--radius);padding:16px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;
+    transition:transform .15s;text-align:left;display:flex;flex-direction:column;gap:8px;
+    min-height:140px;border:1.5px solid transparent;
+  }
+  .deck-card:active{transform:scale(.97)}
+  .deck-icon{
+    width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+    font-size:24px;
+  }
+  .deck-card .deck-title{font-size:14.5px;font-weight:700;line-height:1.25}
+  .deck-card .deck-sub{font-size:11.5px;color:var(--text-muted)}
+  .deck-card .deck-meta{
+    margin-top:auto;display:flex;align-items:center;justify-content:space-between;
+    font-size:11px;color:var(--text-muted);font-weight:500;
+  }
+  .progress-bar{
+    height:5px;background:var(--surface-2);border-radius:99px;overflow:hidden;flex:1;margin-right:8px;
+  }
+  .progress-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .4s}
+
+  /* Deck detail */
+  .nav{display:flex;align-items:center;gap:10px;padding:10px 14px}
+  .back-btn{
+    width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
+    background:var(--surface);box-shadow:var(--shadow);font-size:18px;flex-shrink:0;
+  }
+  .nav-title{font-size:17px;font-weight:700;flex:1;line-height:1.2}
+  .nav-sub{font-size:12px;color:var(--text-muted);font-weight:500}
+
+  .deck-header{
+    margin:6px 18px 18px;padding:22px 22px;border-radius:var(--radius);
+    color:white;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;
+  }
+  .deck-header::after{
+    content:"";position:absolute;top:-40px;right:-40px;
+    width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.1);
+  }
+  .deck-header h2{font-size:24px;font-weight:800;margin-bottom:4px;position:relative}
+  .deck-header p{font-size:14px;opacity:.92;position:relative}
+  .deck-header-stats{
+    display:flex;gap:14px;margin-top:14px;position:relative;
+  }
+  .chip{
+    background:rgba(255,255,255,.18);padding:5px 11px;border-radius:99px;
+    font-size:12px;font-weight:600;backdrop-filter:blur(10px);
+  }
+
+  /* Mode list */
+  .modes{padding:0 18px;display:flex;flex-direction:column;gap:10px}
+  .mode-card{
+    background:var(--surface);border-radius:var(--radius);padding:16px 18px;
+    box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;
+    text-align:left;transition:transform .15s;
+  }
+  .mode-card:active{transform:scale(.98)}
+  .mode-icon{
+    width:48px;height:48px;border-radius:14px;display:grid;place-items:center;
+    font-size:24px;background:var(--primary-light);flex-shrink:0;
+  }
+  .mode-info{flex:1}
+  .mode-info h3{font-size:16px;font-weight:700;margin-bottom:2px}
+  .mode-info p{font-size:12.5px;color:var(--text-muted)}
+  .mode-arrow{color:var(--text-muted);font-size:18px;font-weight:700}
+
+  /* Cards list (in deck detail) */
+  .cards-list{padding:0 18px;display:flex;flex-direction:column;gap:8px}
+  .card-row{
+    background:var(--surface);border-radius:var(--radius-sm);padding:12px 14px;
+    box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;
+  }
+  .card-row .term{font-weight:700;font-size:14.5px}
+  .card-row .def{font-size:13px;color:var(--text-muted);margin-top:2px}
+  .star-btn{font-size:18px;background:none;line-height:1;flex-shrink:0;opacity:.4;transition:opacity .2s}
+  .star-btn.active{opacity:1}
+
+  /* Flashcards */
+  .mode-screen{padding:0 18px;display:flex;flex-direction:column;min-height:calc(100vh - 60px)}
+  .topbar-mode{
+    display:flex;align-items:center;gap:10px;padding:10px 4px 16px;
+  }
+  .topbar-mode .progress-bar{height:7px;flex:1}
+  .progress-text{font-size:13px;font-weight:600;color:var(--text-muted);min-width:46px;text-align:right}
+
+  .fc-stage{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:8px 0 12px;perspective:1500px;min-height:340px;
+  }
+  .fc-card{
+    width:100%;max-width:430px;aspect-ratio:3/4;max-height:480px;
+    position:relative;cursor:pointer;
+    transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .fc-card.flipped{transform:rotateY(180deg)}
+  .fc-face{
+    position:absolute;inset:0;border-radius:24px;
+    background:var(--surface);box-shadow:var(--shadow-lg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:30px 22px;backface-visibility:hidden;text-align:center;
+    border:2px solid var(--border);
+  }
+  .fc-face.back{transform:rotateY(180deg);background:linear-gradient(135deg,#FFF7E5,#FFEFC2);border-color:var(--accent)}
+  [data-theme="dark"] .fc-face.back{background:linear-gradient(135deg,#3A2F0E,#5A4A1E);border-color:var(--accent-dark)}
+  .fc-face .lang-tag{
+    position:absolute;top:18px;left:18px;font-size:10.5px;font-weight:700;letter-spacing:.7px;
+    text-transform:uppercase;color:var(--text-muted);background:var(--surface-2);
+    padding:4px 9px;border-radius:99px;
+  }
+  .fc-speak{
+    position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;
+    background:var(--surface-2);display:grid;place-items:center;font-size:16px;
+  }
+  .fc-text{font-size:30px;font-weight:800;line-height:1.2;word-break:break-word}
+  .fc-example{margin-top:18px;font-size:14px;color:var(--text-muted);font-style:italic;line-height:1.4}
+  .fc-hint{position:absolute;bottom:18px;font-size:11px;color:var(--text-muted);font-weight:500}
+
+  .fc-controls{display:flex;gap:10px;margin-top:16px}
+  .fc-btn{
+    flex:1;padding:14px;border-radius:14px;font-weight:700;font-size:15px;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:transform .1s;
+  }
+  .fc-btn:active{transform:scale(.97)}
+  .fc-btn.no{background:var(--danger-light);color:var(--danger)}
+  .fc-btn.yes{background:var(--success-light);color:var(--success)}
+  .fc-btn.skip{background:var(--surface);color:var(--text-muted);box-shadow:var(--shadow);flex:0 0 56px}
+
+  .fc-card.swipe-yes{transform:translateX(40%) rotate(8deg);opacity:0;transition:transform .35s,opacity .35s}
+  .fc-card.swipe-no{transform:translateX(-40%) rotate(-8deg);opacity:0;transition:transform .35s,opacity .35s}
+  .fc-card.swipe-yes.flipped{transform:translateX(40%) rotate(8deg) rotateY(180deg);opacity:0}
+  .fc-card.swipe-no.flipped{transform:translateX(-40%) rotate(-8deg) rotateY(180deg);opacity:0}
+
+  /* Learn mode */
+  .learn-prompt{
+    background:var(--surface);border-radius:var(--radius);padding:32px 22px;
+    box-shadow:var(--shadow);text-align:center;margin-bottom:20px;
+  }
+  .learn-prompt .small{font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+  .learn-prompt .word{font-size:30px;font-weight:800;line-height:1.2;word-break:break-word}
+  .learn-prompt .speak-btn{margin:14px auto 0;width:42px;height:42px;border-radius:50%;background:var(--primary-light);display:grid;place-items:center;font-size:18px}
+  .learn-options{display:flex;flex-direction:column;gap:10px}
+  .learn-option{
+    background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
+    padding:14px 18px;font-size:15.5px;font-weight:600;text-align:left;
+    transition:all .15s;display:flex;align-items:center;gap:10px;
+  }
+  .learn-option:active{transform:scale(.98)}
+  .learn-option .num{
+    width:26px;height:26px;border-radius:50%;background:var(--surface-2);
+    display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--text-muted);flex-shrink:0;
+  }
+  .learn-option.correct{background:var(--success-light);border-color:var(--success);color:var(--success)}
+  .learn-option.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger)}
+  .learn-option.correct .num,.learn-option.wrong .num{background:transparent}
+  .learn-typing input{
+    width:100%;padding:16px;border:2px solid var(--border);border-radius:14px;
+    background:var(--surface);font-size:18px;font-weight:600;
+  }
+  .learn-typing input:focus{border-color:var(--primary)}
+  .learn-typing.correct input{border-color:var(--success);background:var(--success-light);color:var(--success)}
+  .learn-typing.wrong input{border-color:var(--danger);background:var(--danger-light);color:var(--danger)}
+  .learn-feedback{
+    margin-top:14px;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:600;
+    display:none;
+  }
+  .learn-feedback.show{display:block}
+  .learn-feedback.correct{background:var(--success-light);color:var(--success)}
+  .learn-feedback.wrong{background:var(--danger-light);color:var(--danger)}
+  .primary-btn{
+    width:100%;padding:16px;border-radius:14px;background:var(--primary);color:white;
+    font-weight:700;font-size:15.5px;margin-top:14px;transition:transform .1s;
+  }
+  .primary-btn:active{transform:scale(.98)}
+  .primary-btn:disabled{opacity:.5}
+  .ghost-btn{
+    width:100%;padding:14px;border-radius:14px;background:var(--surface);color:var(--text);
+    font-weight:600;font-size:14.5px;margin-top:8px;box-shadow:var(--shadow);
+  }
+
+  /* Match mode */
+  .match-bar{
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
+    background:var(--surface);padding:12px 16px;border-radius:14px;box-shadow:var(--shadow);
+  }
+  .match-bar .timer{font-size:18px;font-weight:800;color:var(--primary)}
+  .match-bar .label{font-size:11.5px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .match-grid{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;
+  }
+  .match-tile{
+    background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+    padding:14px 8px;font-size:13px;font-weight:600;text-align:center;line-height:1.2;
+    min-height:78px;display:grid;place-items:center;cursor:pointer;
+    transition:all .15s;word-break:break-word;
+  }
+  .match-tile:active{transform:scale(.95)}
+  .match-tile.selected{background:var(--primary);color:white;border-color:var(--primary)}
+  .match-tile.matched{background:var(--success-light);border-color:var(--success);color:var(--success);opacity:.5;pointer-events:none}
+  .match-tile.wrong{background:var(--danger-light);border-color:var(--danger);color:var(--danger);animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  /* Test mode */
+  .test-q{
+    background:var(--surface);border-radius:var(--radius);padding:22px;
+    box-shadow:var(--shadow);margin-bottom:14px;
+  }
+  .test-q-num{font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+  .test-q-prompt{font-size:18px;font-weight:700;line-height:1.3;margin-bottom:14px}
+  .test-results{
+    background:var(--surface);border-radius:var(--radius);padding:30px 22px;text-align:center;
+    box-shadow:var(--shadow-lg);margin-bottom:18px;
+  }
+  .test-results .score{font-size:60px;font-weight:800;line-height:1;color:var(--primary)}
+  .test-results .out-of{font-size:18px;color:var(--text-muted);font-weight:600;margin-top:4px}
+  .test-results .summary{font-size:14px;margin-top:14px}
+  .review-item{
+    background:var(--surface);padding:14px;border-radius:var(--radius-sm);
+    box-shadow:var(--shadow);margin-bottom:8px;border-left:4px solid var(--danger);
+  }
+  .review-item .q{font-size:13px;color:var(--text-muted);margin-bottom:4px}
+  .review-item .a{font-size:14.5px;font-weight:600}
+  .review-item .a strike{color:var(--danger);text-decoration:line-through;margin-right:8px}
+  .review-item .a .right{color:var(--success);font-weight:700}
+
+  /* Toast / done overlay */
+  .done-screen{
+    text-align:center;padding:40px 22px;
+  }
+  .done-screen .emoji{font-size:80px;margin-bottom:14px}
+  .done-screen h2{font-size:26px;font-weight:800;margin-bottom:6px}
+  .done-screen p{font-size:15px;color:var(--text-muted);margin-bottom:22px}
+  .done-actions{display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto}
+
+  /* Settings drawer */
+  .drawer-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;
+    opacity:0;pointer-events:none;transition:opacity .2s;
+  }
+  .drawer-overlay.show{opacity:1;pointer-events:auto}
+  .drawer{
+    position:fixed;left:0;right:0;bottom:0;background:var(--surface);
+    border-radius:24px 24px 0 0;padding:18px 22px 28px;z-index:101;
+    transform:translateY(100%);transition:transform .25s cubic-bezier(.4,.2,.2,1);
+    max-width:520px;margin:0 auto;
+  }
+  .drawer.show{transform:translateY(0)}
+  .drawer-handle{width:42px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 16px}
+  .drawer h3{font-size:18px;font-weight:800;margin-bottom:14px}
+  .setting-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 0;border-bottom:1px solid var(--border);
+  }
+  .setting-row:last-child{border-bottom:none}
+  .setting-row .label{font-size:14.5px;font-weight:600}
+  .setting-row .desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+  .toggle{
+    width:46px;height:26px;background:var(--surface-2);border-radius:99px;
+    position:relative;transition:background .2s;flex-shrink:0;
+  }
+  .toggle::after{
+    content:"";position:absolute;width:20px;height:20px;background:white;
+    border-radius:50%;top:3px;left:3px;transition:transform .2s;
+    box-shadow:0 1px 4px rgba(0,0,0,.2);
+  }
+  .toggle.on{background:var(--primary)}
+  .toggle.on::after{transform:translateX(20px)}
+
+  /* utility */
+  .hidden{display:none!important}
+  .empty{
+    text-align:center;padding:50px 20px;color:var(--text-muted);
+  }
+  .empty .emoji{font-size:50px;margin-bottom:12px}
+
+  /* Animations */
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn .25s ease-out}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+  @media (max-width: 360px){
+    .deck-card .deck-title{font-size:13.5px}
+    .fc-text{font-size:26px}
+  }
+</style>
 </head>
 <body>
-  <div class="app">
-    <h1>Dutch Practice Games</h1>
+<div id="app"></div>
 
-    <div id="statusBar">
-      <div>
-        Score: <strong id="score">0</strong> /
-        <span id="questions">0</span>
-        · Wrong: <strong id="wrong">0</strong>
-        · Streak: <strong id="streak">0</strong>
-        · Best: <strong id="bestStreak">0</strong>
-      </div>
-      <div>Current category: <span id="currentCategory">All</span></div>
-    </div>
-
-    <div class="controls controls-bottom">
-      <label>
-        Direction:
-        <select id="directionSelect">
-          <option value="nl-id">Dutch → Indonesian</option>
-          <option value="id-nl">Indonesian → Dutch</option>
-        </select>
-      </label>
-      <label>
-        Mode:
-        <select id="modeSelect">
-          <option value="flashcard">Flashcards</option>
-          <option value="multiple">Multiple Choice</option>
-          <option value="typing">Type the Answer</option>
-        </select>
-      </label>
-      <label>
-        Category:
-        <select id="categorySelect"></select>
-      </label>
-      <button id="startBtn" type="button">Start / Next</button>
-      <button id="resetBtn" type="button">Reset Stats</button>
-    </div>
-
-    <div id="gameArea">
-      <p>Select a mode and category, then press <strong>Start / Next</strong>.</p>
-    </div>
-    <div id="feedback"></div>
-
-    <div id="hintPopup" class="hint-popup-overlay">
-      <div class="hint-popup-box">
-        <h2>Hint used</h2>
-        <p>Using a hint will reduce your score by 1 point for this question.</p>
-        <button id="hintPopupBtn" type="button">Got it</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-  // ===== DATA =====
-  const vocabData = [
-    // Daily routine
-    { dutch: "opstaan", meaning: "bangun / to get up", example: "Ik sta om 7 uur op.", category: "Daily routine" },
-    { dutch: "aandoen", meaning: "menyalakan / to turn on, to put on", example: "Ik doe de lamp aan.", category: "Daily routine" },
-    { dutch: "meenemen", meaning: "membawa ikut / to take along", example: "Ik neem mijn boek mee.", category: "Daily routine" },
-    { dutch: "opruimen", meaning: "merapikan / to tidy up", example: "Ik ruim mijn kamer op.", category: "Daily routine" },
-    { dutch: "slapen", meaning: "tidur / to sleep", example: "Ik ga om 11 uur slapen.", category: "Daily routine" },
-
-    // Time words
-    { dutch: "eerst", meaning: "first", example: "Eerst eet ik ontbijt.", category: "Time words" },
-    { dutch: "daarna", meaning: "kemudian / then", example: "Daarna ga ik werken.", category: "Time words" },
-    { dutch: "ten slotte", meaning: "akhirnya / finally", example: "Ten slotte ga ik slapen.", category: "Time words" },
-    { dutch: "straks", meaning: "nanti / later", example: "Ik ga straks koken.", category: "Time words" },
-
-    // Feelings & opinions
-    { dutch: "niet zo leuk", meaning: "so-so / not so nice", example: "De film was niet zo leuk.", category: "Feelings & opinions" },
-    { dutch: "spannend", meaning: "tegang / exciting", example: "De film was heel spannend.", category: "Feelings & opinions" },
-
-    // People & family
-    { dutch: "gasten", meaning: "tamu / guests", example: "We krijgen vanavond gasten.", category: "People & family" },
-    { dutch: "schoonmoeder", meaning: "mother-in-law", example: "Mijn schoonmoeder woont in Nederland.", category: "People & family" },
-
-    // Body & looks
-    { dutch: "buikpijn", meaning: "sakit perut / stomach ache", example: "Ik heb buikpijn.", category: "Body & looks" },
-    { dutch: "keelpijn", meaning: "sakit tenggorokan / sore throat", example: "Ik heb keelpijn.", category: "Body & looks" },
-    { dutch: "rimpels", meaning: "keriput / wrinkles", example: "Oma heeft rimpels.", category: "Body & looks" },
-    { dutch: "kaal", meaning: "botak / bald", example: "Hij is kaal.", category: "Body & looks" },
-
-    // Transport & directions
-    { dutch: "verkeer", meaning: "lalu lintas / traffic", example: "Het verkeer is druk.", category: "Transport & directions" },
-    { dutch: "rechts", meaning: "kanan / right", example: "Ga rechts bij het kruispunt.", category: "Transport & directions" },
-    { dutch: "links", meaning: "kiri / left", example: "Sla linksaf.", category: "Transport & directions" },
-    { dutch: "rechtdoor", meaning: "lurus / straight ahead", example: "Rij rechtdoor tot de rotonde.", category: "Transport & directions" },
-
-    // Extra
-    { dutch: "het hangt af van", meaning: "it depends on", example: "Het hangt af van mijn mood.", category: "Extra" },
-    { dutch: "verjaardag", meaning: "ulang tahun / birthday", example: "Ik ben jarig vandaag.", category: "Extra" },
-
-    // Doctor & health
-    { dutch: "klachten", meaning: "masalah / gejala", example: "Ik heb klachten aan mijn rug.", category: "Doctor & health" },
-    { dutch: "spreekuur", meaning: "konsultasi dokter", example: "Het spreekuur begint om 9 uur.", category: "Doctor & health" },
-    { dutch: "nog steeds", meaning: "masih / still", example: "Ik ben nog steeds moe.", category: "Doctor & health" },
-
-    // Weather
-    { dutch: "het is zonnig", meaning: "cerah sekarang", example: "Vandaag is het zonnig.", category: "Weather" },
-    { dutch: "het regent", meaning: "sedang hujan", example: "Het regent nu.", category: "Weather" },
-
-    // October words (sample)
-    { dutch: "zin", meaning: "keinginan", example: "Ik heb zin in koffie.", category: "October words" },
-    { dutch: "misselijk", meaning: "mual", example: "Ik ben misselijk.", category: "October words" },
-    { dutch: "verkouden", meaning: "batuk pilek", example: "Ik ben verkouden.", category: "October words" },
-
-    // Extra words
-    { dutch: "bagage", meaning: "barang bawaan", example: "Mijn bagage is zwaar.", category: "Extra words" },
-    { dutch: "uitgaan", meaning: "keluar", example: "We gaan vanavond uit.", category: "Extra words" },
-  ];
-
-  let currentMode = "flashcard";
-  let currentCategory = "All";
-  let currentIndex = 0;
-  let filtered = [];
-  let score = 0;
-  let questions = 0;
-  let wrong = 0;
-  let streak = 0;
-  let bestStreak = 0;
-  let lock = false;
-
-  const gameArea = document.getElementById("gameArea");
-  const scoreEl = document.getElementById("score");
-  const qEl = document.getElementById("questions");
-  const wrongEl = document.getElementById("wrong");
-  const streakEl = document.getElementById("streak");
-  const bestStreakEl = document.getElementById("bestStreak");
-  const feedbackEl = document.getElementById("feedback");
-  const currCatEl = document.getElementById("currentCategory");
-  const directionSelect = document.getElementById("directionSelect");
-  const modeSelect = document.getElementById("modeSelect");
-  const categorySelect = document.getElementById("categorySelect");
-  const startBtn = document.getElementById("startBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const hintPopup = document.getElementById("hintPopup");
-  const hintPopupBtn = document.getElementById("hintPopupBtn");
-
-  function showHintPopup() {
-    if (!hintPopup) return;
-    hintPopup.style.display = "flex";
-  }
-
-  if (hintPopupBtn) {
-    hintPopupBtn.addEventListener("click", () => {
-      hintPopup.style.display = "none";
-    });
-  }
-
-  function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-  }
-
-  function initCategories() {
-    const cats = new Set(vocabData.map(v => v.category));
-    const sorted = Array.from(cats).sort();
-    categorySelect.innerHTML = "";
-    const allOpt = document.createElement("option");
-    allOpt.value = "All";
-    allOpt.textContent = "All";
-    categorySelect.appendChild(allOpt);
-    sorted.forEach(cat => {
-      const opt = document.createElement("option");
-      opt.value = cat;
-      opt.textContent = cat;
-      categorySelect.appendChild(opt);
-    });
-    categorySelect.value = "All";
-    currCatEl.textContent = "All";
-  }
-
-  function updateFiltered() {
-    const cat = categorySelect.value || "All";
-    currentCategory = cat;
-    if (cat === "All") {
-      filtered = [...vocabData];
-    } else {
-      filtered = vocabData.filter(v => v.category === cat);
-    }
-    shuffle(filtered);
-    currentIndex = 0;
-    currCatEl.textContent = cat;
-  }
-
-  function nextItem() {
-    lock = false;
-    feedbackEl.textContent = "";
-    feedbackEl.className = "";
-
-    if (!filtered.length) {
-      updateFiltered();
-    }
-    if (!filtered.length) {
-      gameArea.innerHTML = "<p>No items in this category yet.</p>";
-      return;
-    }
-
-    if (currentIndex >= filtered.length) {
-      shuffle(filtered);
-      currentIndex = 0;
-    }
-    const item = filtered[currentIndex++];
-
-    if (currentMode === "flashcard") {
-      renderFlashcard(item);
-    } else if (currentMode === "multiple") {
-      renderMultipleChoice(item, currentIndex - 1);
-    } else {
-      renderTyping(item);
-    }
-  }
-
-  function renderFlashcard(item) {
-    const direction = directionSelect.value;
-    gameArea.innerHTML = "";
-    const card = document.createElement("div");
-    card.className = "flashcard";
-
-    const tag = document.createElement("small");
-    tag.innerHTML = `Category: <span class="tag">${item.category}</span>`;
-    card.appendChild(tag);
-
-    const qDiv = document.createElement("div");
-    qDiv.className = "flash-question";
-    const aDiv = document.createElement("div");
-    aDiv.className = "flash-answer";
-
-    if (direction === "nl-id") {
-      qDiv.textContent = item.dutch;
-      aDiv.textContent = `${item.meaning} ${item.example ? " · " + item.example : ""}`;
-    } else {
-      const indo = item.meaning.split("/")[0].trim();
-      qDiv.textContent = indo;
-      aDiv.textContent = `${item.dutch} ${item.example ? " · " + item.example : ""}`;
-    }
-    aDiv.style.display = "none";
-
-    const sub = document.createElement("div");
-    sub.className = "subprompt";
-    sub.textContent = "Klik untuk zien / melihat jawaban.";
-
-    card.appendChild(qDiv);
-    card.appendChild(sub);
-    card.appendChild(aDiv);
-
-    let flipped = false;
-    card.addEventListener("click", () => {
-      flipped = !flipped;
-      aDiv.style.display = flipped ? "block" : "none";
-    });
-
-    gameArea.appendChild(card);
-  }
-
-  function renderMultipleChoice(item, idxInFiltered) {
-    const direction = directionSelect.value;
-    gameArea.innerHTML = "";
-    lock = false;
-
-    const prompt = document.createElement("div");
-    prompt.className = "prompt";
-    if (direction === "nl-id") {
-      prompt.textContent = `Wat betekent: "${item.dutch}"?`;
-    } else {
-      const indo = item.meaning.split("/")[0].trim();
-      prompt.textContent = `Apa arti kata: "${indo}"? (dalam bahasa Belanda)`;
-    }
-    gameArea.appendChild(prompt);
-
-    const sub = document.createElement("div");
-    sub.className = "subprompt";
-    sub.textContent = direction === "nl-id"
-      ? "Pilih arti dalam bahasa Indonesia / Inggris."
-      : "Pilih kata yang benar dalam bahasa Belanda.";
-    gameArea.appendChild(sub);
-
-    const hintRow = document.createElement("div");
-    hintRow.className = "row";
-    const hintBtn = document.createElement("button");
-    hintBtn.type = "button";
-    hintBtn.textContent = "Hint";
-    hintBtn.classList.add("hint-btn");
-    const nextBtn = document.createElement("button");
-    nextBtn.type = "button";
-    nextBtn.textContent = "Next";
-    nextBtn.classList.add("next-btn");
-    nextBtn.style.display = "none";
-    const hintText = document.createElement("div");
-    hintText.className = "hint-text";
-    hintText.textContent = "";
-    let hintLevel = 0;
-    let hintPenaltyApplied = false;
-
-    hintRow.appendChild(hintBtn);
-    hintRow.appendChild(nextBtn);
-    hintRow.appendChild(hintText);
-    gameArea.appendChild(hintRow);
-
-    const choicesDiv = document.createElement("div");
-    choicesDiv.className = "choices";
-
-    hintBtn.addEventListener("click", () => {
-      hintLevel++;
-      if (!hintPenaltyApplied) {
-        showHintPopup();
-        if (score > 0) {
-          score--;
-          scoreEl.textContent = score;
-        }
-        hintPenaltyApplied = true;
-      }
-
-      if (hintLevel === 1) {
-        if (direction === "nl-id") {
-          const indo = item.meaning.split("/")[0].trim();
-          const hangman = indo
-            .split(" ")
-            .map(word =>
-              word
-                .split("")
-                .map((ch, idx) => (idx === 0 ? ch : "_"))
-                .join(" ")
-            )
-            .join("   ");
-          hintText.textContent = `Clue: ${hangman}`;
-        } else {
-          const w = item.dutch.trim();
-          const hangman = w
-            .split(" ")
-            .map(word =>
-              word
-                .split("")
-                .map((ch, idx, arr) => (idx === 0 || idx === arr.length - 1) ? ch : "_")
-                .join(" ")
-            )
-            .join("   ");
-          hintText.textContent = `Clue: ${hangman}`;
-        }
-      } else {
-        if (item.example && item.example.trim() !== "") {
-          hintText.textContent = `Voorbeeld: ${item.example}`;
-        } else {
-          hintText.textContent = "Geen voorbeeldzin beschikbaar.";
-        }
-      }
-    });
-
-    const others = filtered
-      .filter((_, i) => i !== idxInFiltered)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, Math.min(3, Math.max(0, filtered.length - 1)));
-    const options = [item, ...others];
-    shuffle(options);
-
-    const correctText = direction === "nl-id" ? item.meaning : item.dutch;
-
-    options.forEach(optItem => {
-      const btn = document.createElement("button");
-      btn.className = "choice-btn";
-      btn.textContent = direction === "nl-id" ? optItem.meaning : optItem.dutch;
-
-      btn.addEventListener("click", () => {
-        if (lock) return;
-        lock = true;
-        questions++;
-        qEl.textContent = questions;
-
-        const allBtns = choicesDiv.querySelectorAll("button");
-        allBtns.forEach(b => {
-          if (b.textContent === correctText) {
-            b.classList.add("correct");
-          }
-        });
-
-        const isCorrect = btn.textContent === correctText;
-
-        if (isCorrect) {
-          score++;
-          scoreEl.textContent = score;
-          streak++;
-          if (streak > bestStreak) bestStreak = streak;
-          streakEl.textContent = streak;
-          bestStreakEl.textContent = bestStreak;
-
-          feedbackEl.textContent = direction === "nl-id"
-            ? `✅ Goed! Voorbeeld: ${item.example || "—"}`
-            : `✅ Klopt! ${item.dutch} = ${item.meaning}.`;
-          feedbackEl.className = "ok";
-
-          setTimeout(() => {
-            nextItem();
-          }, 2000);
-        } else {
-          wrong++;
-          wrongEl.textContent = wrong;
-          streak = 0;
-          streakEl.textContent = streak;
-          btn.classList.add("wrong");
-          feedbackEl.textContent = direction === "nl-id"
-            ? `❌ Bukan. Jawaban benar: ${item.meaning}`
-            : `❌ Niet goed. Jawaban benar: ${item.dutch}`;
-          feedbackEl.className = "bad";
-
-          alert(
-            direction === "nl-id"
-              ? `Jawaban benar: ${item.meaning}
-Contoh: ${item.example || "—"}`
-              : `Correct answer: ${item.dutch}
-Meaning: ${item.meaning}
-Example: ${item.example || "—"}`
-          );
-
-          nextBtn.style.display = "inline-block";
-          nextBtn.onclick = () => {
-            nextItem();
-          };
-        }
-      });
-
-      choicesDiv.appendChild(btn);
-    });
-
-    gameArea.appendChild(choicesDiv);
-  }
-
-  function renderTyping(item) {
-    const direction = directionSelect.value;
-    gameArea.innerHTML = "";
-    lock = false;
-
-    const prompt = document.createElement("div");
-    prompt.className = "prompt";
-    if (direction === "nl-id") {
-      prompt.textContent = `Tulis arti dari: "${item.dutch}"`;
-    } else {
-      const indo = item.meaning.split("/")[0].trim();
-      prompt.textContent = `Tulis kata Belanda dari: "${indo}"`;
-    }
-    gameArea.appendChild(prompt);
-
-    const row = document.createElement("div");
-    row.className = "row";
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.placeholder = direction === "nl-id"
-      ? "Tulis artinya di sini..."
-      : "Tulis kata Belanda di sini...";
-    row.appendChild(input);
-
-    const checkBtn = document.createElement("button");
-    checkBtn.textContent = "Check";
-    row.appendChild(checkBtn);
-
-    const hintBtn = document.createElement("button");
-    hintBtn.textContent = "Hint";
-    hintBtn.type = "button";
-    hintBtn.classList.add("hint-btn");
-    row.appendChild(hintBtn);
-
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "Next";
-    nextBtn.type = "button";
-    nextBtn.classList.add("next-btn");
-    nextBtn.style.display = "none";
-    row.appendChild(nextBtn);
-
-    gameArea.appendChild(row);
-
-    const hintText = document.createElement("div");
-    hintText.className = "hint-text";
-    hintText.textContent = "";
-    let hintLevel = 0;
-    let hintPenaltyApplied = false;
-    gameArea.appendChild(hintText);
-
-    hintBtn.addEventListener("click", () => {
-      hintLevel++;
-      if (!hintPenaltyApplied) {
-        showHintPopup();
-        if (score > 0) {
-          score--;
-          scoreEl.textContent = score;
-        }
-        hintPenaltyApplied = true;
-      }
-
-      if (hintLevel === 1) {
-        if (direction === "nl-id") {
-          const indo = item.meaning.split("/")[0].trim();
-          const hangman = indo
-            .split(" ")
-            .map(word =>
-              word
-                .split("")
-                .map((ch, idx) => (idx === 0 ? ch : "_"))
-                .join(" ")
-            )
-            .join("   ");
-          hintText.textContent = `Clue: ${hangman}`;
-        } else {
-          const w = item.dutch.trim();
-          const hangman = w
-            .split(" ")
-            .map(word =>
-              word
-                .split("")
-                .map((ch, idx, arr) => (idx === 0 || idx === arr.length - 1) ? ch : "_")
-                .join(" ")
-            )
-            .join("   ");
-          hintText.textContent = `Clue: ${hangman}`;
-        }
-      } else {
-        if (item.example && item.example.trim() !== "") {
-          hintText.textContent = `Voorbeeld: ${item.example}`;
-        } else {
-          hintText.textContent = "Geen voorbeeldzin beschikbaar.";
-        }
-      }
-    });
-
-    checkBtn.addEventListener("click", () => {
-      if (lock) return;
-      const userRaw = input.value.trim();
-      if (!userRaw) return;
-      const user = userRaw.toLowerCase();
-
-      questions++;
-      qEl.textContent = questions;
-
-      let isCorrect = false;
-      if (direction === "nl-id") {
-        const raw = item.meaning.toLowerCase();
-        const parts = raw.split("/").map(p => p.trim()).filter(Boolean);
-        isCorrect = parts.some(p => user === p || p.includes(user) || user.includes(p));
-      } else {
-        const target = item.dutch.toLowerCase();
-        isCorrect = user === target;
-      }
-
-      if (isCorrect) {
-        score++;
-        scoreEl.textContent = score;
-        streak++;
-        if (streak > bestStreak) bestStreak = streak;
-        streakEl.textContent = streak;
-        bestStreakEl.textContent = bestStreak;
-
-        if (direction === "nl-id") {
-          feedbackEl.textContent = `✅ Yes! ${item.dutch} = ${item.meaning}. Voorbeeld: ${item.example || "—"}`;
-        } else {
-          const indo = item.meaning.split("/")[0].trim();
-          feedbackEl.textContent = `✅ Goed! "${indo}" = ${item.dutch}. Voorbeeld: ${item.example || "—"}`;
-        }
-        feedbackEl.className = "ok";
-
-        setTimeout(() => {
-          nextItem();
-        }, 2000);
-      } else {
-        wrong++;
-        wrongEl.textContent = wrong;
-        streak = 0;
-        streakEl.textContent = streak;
-
-        if (direction === "nl-id") {
-          feedbackEl.textContent = `❌ ${item.dutch} = ${item.meaning}.`;
-          alert(`Juiste antwoord: ${item.dutch} = ${item.meaning}
-Voorbeeld: ${item.example || "—"}`);
-        } else {
-          const indo = item.meaning.split("/")[0].trim();
-          feedbackEl.textContent = `❌ "${indo}" = ${item.dutch}.`;
-          alert(`Correct answer: ${item.dutch}
-Meaning: ${item.meaning}
-Example: ${item.example || "—"}`);
-        }
-
-        feedbackEl.className = "bad";
-        nextBtn.style.display = "inline-block";
-        nextBtn.onclick = () => {
-          nextItem();
-        };
-      }
-    });
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        checkBtn.click();
-      }
-    });
-  }
-
-  modeSelect.addEventListener("change", () => {
-    currentMode = modeSelect.value;
-    feedbackEl.textContent = "";
-    feedbackEl.className = "";
-    gameArea.innerHTML = '<p>Press <strong>Start / Next</strong> to begin this mode.</p>';
-  });
-
-  categorySelect.addEventListener("change", () => {
-    updateFiltered();
-    feedbackEl.textContent = "";
-    feedbackEl.className = "";
-    gameArea.innerHTML = '<p>Category changed. Press <strong>Start / Next</strong>.</p>';
-  });
-
-  directionSelect.addEventListener("change", () => {
-    feedbackEl.textContent = "";
-    feedbackEl.className = "";
-    gameArea.innerHTML = '<p>Direction changed. Press <strong>Start / Next</strong>.</p>';
-  });
-
-  startBtn.addEventListener("click", () => {
-    if (!filtered.length) {
-      updateFiltered();
-    }
-    nextItem();
-  });
-
-  resetBtn.addEventListener("click", () => {
-    score = 0;
-    questions = 0;
-    wrong = 0;
-    streak = 0;
-    bestStreak = 0;
-    scoreEl.textContent = "0";
-    qEl.textContent = "0";
-    wrongEl.textContent = "0";
-    streakEl.textContent = "0";
-    bestStreakEl.textContent = "0";
-    feedbackEl.textContent = "";
-    feedbackEl.className = "";
-    gameArea.innerHTML = '<p>Stats reset. Press <strong>Start / Next</strong> to play again.</p>';
-  });
-
-  initCategories();
-  updateFiltered();
-  scoreEl.textContent = score;
-  qEl.textContent = questions;
-  wrongEl.textContent = wrong;
-  streakEl.textContent = streak;
-  bestStreakEl.textContent = bestStreak;
-</script>
 <script>
-  if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/Dutch-Learning/sw.js')
-              .catch(err => console.warn('SW registration failed:', err));
-      });
+/* =========================================================
+   DATA: Vocabulary decks (Dutch ↔ Indonesian)
+   id: stable id, dutch: Dutch term, indo: Indonesian meaning
+   ex: example sentence (optional), ex_id: Indonesian example
+   ========================================================= */
+const DECKS = [
+  /* === BASIC / TRAVEL === */
+  {
+    id:"greetings", title:"Salam & Sapaan", sub:"Greetings & Politeness",
+    icon:"👋", color:"linear-gradient(135deg,#FF6B6B,#FF8E53)",
+    cards:[
+      {dutch:"Hallo",indo:"Halo",ex:"Hallo, hoe gaat het?",ex_id:"Halo, apa kabar?"},
+      {dutch:"Hoi",indo:"Hai (informal)",ex:"Hoi, alles goed?"},
+      {dutch:"Goedemorgen",indo:"Selamat pagi",ex:"Goedemorgen, mevrouw."},
+      {dutch:"Goedemiddag",indo:"Selamat siang"},
+      {dutch:"Goedenavond",indo:"Selamat malam (sore-malam)"},
+      {dutch:"Goedenacht",indo:"Selamat tidur",ex:"Welterusten, goedenacht."},
+      {dutch:"Tot ziens",indo:"Sampai jumpa"},
+      {dutch:"Tot straks",indo:"Sampai nanti"},
+      {dutch:"Tot morgen",indo:"Sampai besok"},
+      {dutch:"Doei",indo:"Dah / bye (informal)"},
+      {dutch:"Hoe gaat het?",indo:"Apa kabar?",ex:"Hoe gaat het met jou?"},
+      {dutch:"Goed, dank je",indo:"Baik, terima kasih"},
+      {dutch:"Niet zo goed",indo:"Kurang baik"},
+      {dutch:"Dank je wel",indo:"Terima kasih"},
+      {dutch:"Dank u wel",indo:"Terima kasih (formal)"},
+      {dutch:"Graag gedaan",indo:"Sama-sama"},
+      {dutch:"Alstublieft",indo:"Silakan / tolong (formal)"},
+      {dutch:"Alsjeblieft",indo:"Silakan / tolong (informal)"},
+      {dutch:"Sorry",indo:"Maaf"},
+      {dutch:"Pardon",indo:"Permisi"},
+      {dutch:"Excuseer mij",indo:"Permisi (formal)"},
+      {dutch:"Geen probleem",indo:"Tidak masalah"},
+      {dutch:"Welkom",indo:"Selamat datang"},
+      {dutch:"Aangenaam",indo:"Senang berkenalan"},
+      {dutch:"Tot de volgende keer",indo:"Sampai jumpa lagi"},
+      {dutch:"Fijne dag",indo:"Selamat beraktivitas / good day"},
+      {dutch:"Veel succes",indo:"Semoga sukses"},
+      {dutch:"Gefeliciteerd",indo:"Selamat (atas...)"},
+    ]
+  },
+  {
+    id:"intro", title:"Perkenalan Diri", sub:"Introductions",
+    icon:"🤝", color:"linear-gradient(135deg,#43B0FF,#4255FF)",
+    cards:[
+      {dutch:"Hoe heet je?",indo:"Siapa namamu?"},
+      {dutch:"Hoe heet u?",indo:"Siapa nama Anda? (formal)"},
+      {dutch:"Ik heet …",indo:"Nama saya …",ex:"Ik heet Susan."},
+      {dutch:"Mijn naam is …",indo:"Nama saya …"},
+      {dutch:"Waar kom je vandaan?",indo:"Dari mana asalmu?"},
+      {dutch:"Ik kom uit Indonesië",indo:"Saya dari Indonesia"},
+      {dutch:"Ik woon in Amsterdam",indo:"Saya tinggal di Amsterdam"},
+      {dutch:"Hoe oud ben je?",indo:"Berapa umurmu?"},
+      {dutch:"Ik ben … jaar oud",indo:"Saya berumur … tahun"},
+      {dutch:"Wat doe je?",indo:"Apa pekerjaanmu?"},
+      {dutch:"Ik ben student",indo:"Saya pelajar/mahasiswa"},
+      {dutch:"Ik werk als …",indo:"Saya bekerja sebagai …"},
+      {dutch:"Spreek je Engels?",indo:"Apakah kamu bisa bahasa Inggris?"},
+      {dutch:"Ik spreek een beetje Nederlands",indo:"Saya bisa sedikit bahasa Belanda"},
+      {dutch:"Ik begrijp het niet",indo:"Saya tidak mengerti"},
+      {dutch:"Kun je het herhalen?",indo:"Bisakah kamu mengulang?"},
+      {dutch:"Kun je langzamer spreken?",indo:"Bisa bicara lebih pelan?"},
+      {dutch:"Wat betekent dit?",indo:"Apa artinya ini?"},
+      {dutch:"Hoe zeg je … in het Nederlands?",indo:"Bagaimana mengatakan … dalam bahasa Belanda?"},
+      {dutch:"Aangenaam kennis te maken",indo:"Senang berkenalan dengan Anda"},
+    ]
+  },
+  {
+    id:"numbers", title:"Angka & Tanggal", sub:"Numbers, Days, Months",
+    icon:"🔢", color:"linear-gradient(135deg,#10B981,#34D399)",
+    cards:[
+      {dutch:"nul",indo:"0 — nol"},
+      {dutch:"een",indo:"1 — satu"},
+      {dutch:"twee",indo:"2 — dua"},
+      {dutch:"drie",indo:"3 — tiga"},
+      {dutch:"vier",indo:"4 — empat"},
+      {dutch:"vijf",indo:"5 — lima"},
+      {dutch:"zes",indo:"6 — enam"},
+      {dutch:"zeven",indo:"7 — tujuh"},
+      {dutch:"acht",indo:"8 — delapan"},
+      {dutch:"negen",indo:"9 — sembilan"},
+      {dutch:"tien",indo:"10 — sepuluh"},
+      {dutch:"elf",indo:"11 — sebelas"},
+      {dutch:"twaalf",indo:"12 — dua belas"},
+      {dutch:"dertien",indo:"13 — tiga belas"},
+      {dutch:"twintig",indo:"20 — dua puluh"},
+      {dutch:"eenentwintig",indo:"21 — dua puluh satu"},
+      {dutch:"dertig",indo:"30 — tiga puluh"},
+      {dutch:"veertig",indo:"40"},
+      {dutch:"vijftig",indo:"50"},
+      {dutch:"zestig",indo:"60"},
+      {dutch:"zeventig",indo:"70"},
+      {dutch:"tachtig",indo:"80"},
+      {dutch:"negentig",indo:"90"},
+      {dutch:"honderd",indo:"100 — seratus"},
+      {dutch:"duizend",indo:"1000 — seribu"},
+      {dutch:"maandag",indo:"Senin"},
+      {dutch:"dinsdag",indo:"Selasa"},
+      {dutch:"woensdag",indo:"Rabu"},
+      {dutch:"donderdag",indo:"Kamis"},
+      {dutch:"vrijdag",indo:"Jumat"},
+      {dutch:"zaterdag",indo:"Sabtu"},
+      {dutch:"zondag",indo:"Minggu"},
+      {dutch:"januari",indo:"Januari"},
+      {dutch:"februari",indo:"Februari"},
+      {dutch:"maart",indo:"Maret"},
+      {dutch:"april",indo:"April"},
+      {dutch:"mei",indo:"Mei"},
+      {dutch:"juni",indo:"Juni"},
+      {dutch:"juli",indo:"Juli"},
+      {dutch:"augustus",indo:"Agustus"},
+      {dutch:"september",indo:"September"},
+      {dutch:"oktober",indo:"Oktober"},
+      {dutch:"november",indo:"November"},
+      {dutch:"december",indo:"Desember"},
+      {dutch:"vandaag",indo:"hari ini"},
+      {dutch:"gisteren",indo:"kemarin"},
+      {dutch:"morgen",indo:"besok"},
+      {dutch:"overmorgen",indo:"lusa"},
+      {dutch:"volgende week",indo:"minggu depan"},
+      {dutch:"vorige week",indo:"minggu lalu"},
+      {dutch:"Hoe laat is het?",indo:"Jam berapa sekarang?"},
+      {dutch:"Het is drie uur",indo:"Sekarang jam tiga"},
+      {dutch:"half zeven",indo:"jam setengah tujuh (06:30)"},
+      {dutch:"kwart over zes",indo:"jam 06:15"},
+      {dutch:"kwart voor zeven",indo:"jam 06:45"},
+    ]
+  },
+  {
+    id:"restaurant", title:"Restoran & Makanan", sub:"Restaurant & Food",
+    icon:"🍽️", color:"linear-gradient(135deg,#F59E0B,#FB923C)",
+    cards:[
+      {dutch:"Een tafel voor twee, alstublieft",indo:"Meja untuk dua orang, tolong"},
+      {dutch:"De menukaart, alstublieft",indo:"Tolong menunya"},
+      {dutch:"Wat kunt u aanbevelen?",indo:"Apa rekomendasi Anda?"},
+      {dutch:"Ik wil graag …",indo:"Saya mau …",ex:"Ik wil graag een koffie."},
+      {dutch:"Mag ik …?",indo:"Boleh saya minta …?"},
+      {dutch:"Ik ben vegetariër",indo:"Saya vegetarian"},
+      {dutch:"Ik eet geen vlees",indo:"Saya tidak makan daging"},
+      {dutch:"Ik ben allergisch voor …",indo:"Saya alergi terhadap …"},
+      {dutch:"De rekening, alstublieft",indo:"Tolong tagihannya"},
+      {dutch:"Mag ik afrekenen?",indo:"Boleh saya bayar?"},
+      {dutch:"Kan ik met kaart betalen?",indo:"Bisakah saya bayar pakai kartu?"},
+      {dutch:"Het smaakt heerlijk",indo:"Rasanya enak sekali"},
+      {dutch:"Lekker!",indo:"Enak!"},
+      {dutch:"Het is te zout",indo:"Terlalu asin"},
+      {dutch:"ontbijt",indo:"sarapan"},
+      {dutch:"lunch",indo:"makan siang"},
+      {dutch:"diner / avondeten",indo:"makan malam"},
+      {dutch:"voorgerecht",indo:"makanan pembuka"},
+      {dutch:"hoofdgerecht",indo:"makanan utama"},
+      {dutch:"nagerecht / toetje",indo:"makanan penutup"},
+      {dutch:"water",indo:"air"},
+      {dutch:"koffie",indo:"kopi"},
+      {dutch:"thee",indo:"teh"},
+      {dutch:"melk",indo:"susu"},
+      {dutch:"sap",indo:"jus"},
+      {dutch:"wijn",indo:"anggur"},
+      {dutch:"bier",indo:"bir"},
+      {dutch:"brood",indo:"roti"},
+      {dutch:"kaas",indo:"keju"},
+      {dutch:"vlees",indo:"daging"},
+      {dutch:"vis",indo:"ikan"},
+      {dutch:"kip",indo:"ayam"},
+      {dutch:"groenten",indo:"sayuran"},
+      {dutch:"fruit",indo:"buah"},
+      {dutch:"rijst",indo:"nasi"},
+      {dutch:"soep",indo:"sup"},
+      {dutch:"pittig",indo:"pedas"},
+      {dutch:"zoet",indo:"manis"},
+      {dutch:"zout",indo:"asin"},
+      {dutch:"warm",indo:"panas / hangat"},
+      {dutch:"koud",indo:"dingin"},
+    ]
+  },
+  {
+    id:"shopping", title:"Belanja", sub:"Shopping",
+    icon:"🛍️", color:"linear-gradient(135deg,#EC4899,#F472B6)",
+    cards:[
+      {dutch:"Hoeveel kost het?",indo:"Berapa harganya?"},
+      {dutch:"Wat kost dit?",indo:"Berapa harga ini?"},
+      {dutch:"Het is te duur",indo:"Terlalu mahal"},
+      {dutch:"Heeft u korting?",indo:"Apakah ada diskon?"},
+      {dutch:"in de aanbieding",indo:"sedang diskon / promo"},
+      {dutch:"Ik kijk alleen even",indo:"Saya cuma lihat-lihat"},
+      {dutch:"Ik wil dit kopen",indo:"Saya mau beli ini"},
+      {dutch:"Heeft u dit in een andere maat?",indo:"Apakah ada ukuran lain?"},
+      {dutch:"Heeft u dit in een andere kleur?",indo:"Apakah ada warna lain?"},
+      {dutch:"Welke maat heeft u?",indo:"Ukuran berapa yang Anda butuhkan?"},
+      {dutch:"Mag ik het passen?",indo:"Boleh saya coba pakai?"},
+      {dutch:"Waar is de paskamer?",indo:"Di mana kamar pas?"},
+      {dutch:"Het past niet",indo:"Tidak pas"},
+      {dutch:"Het is te groot",indo:"Terlalu besar"},
+      {dutch:"Het is te klein",indo:"Terlalu kecil"},
+      {dutch:"Ik neem het",indo:"Saya ambil"},
+      {dutch:"Mag ik afrekenen?",indo:"Boleh saya bayar?"},
+      {dutch:"Contant of pin?",indo:"Tunai atau kartu debit?"},
+      {dutch:"Mag ik een kassabon?",indo:"Boleh minta struk?"},
+      {dutch:"een tas",indo:"tas"},
+      {dutch:"Mag ik een tasje?",indo:"Boleh minta tas plastik?"},
+      {dutch:"goedkoop",indo:"murah"},
+      {dutch:"duur",indo:"mahal"},
+      {dutch:"openingstijden",indo:"jam buka"},
+      {dutch:"Wanneer gaat u open/dicht?",indo:"Kapan Anda buka/tutup?"},
+      {dutch:"de winkel",indo:"toko"},
+      {dutch:"de supermarkt",indo:"supermarket"},
+      {dutch:"de markt",indo:"pasar"},
+      {dutch:"de apotheek",indo:"apotek"},
+      {dutch:"de bakker",indo:"toko roti"},
+      {dutch:"de slager",indo:"toko daging"},
+      {dutch:"Heeft u wisselgeld?",indo:"Apakah ada kembalian?"},
+      {dutch:"Houd het wisselgeld maar",indo:"Kembaliannya untuk Anda"},
+      {dutch:"Kunt u dit inpakken?",indo:"Bisakah ini dibungkus?"},
+    ]
+  },
+  {
+    id:"hotel", title:"Hotel & Penginapan", sub:"Hotel & Accommodation",
+    icon:"🏨", color:"linear-gradient(135deg,#8B5CF6,#A78BFA)",
+    cards:[
+      {dutch:"Ik heb een reservering",indo:"Saya punya reservasi"},
+      {dutch:"op naam van …",indo:"atas nama …"},
+      {dutch:"Heeft u nog kamers vrij?",indo:"Apakah masih ada kamar kosong?"},
+      {dutch:"Een eenpersoonskamer",indo:"Kamar untuk satu orang"},
+      {dutch:"Een tweepersoonskamer",indo:"Kamar untuk dua orang"},
+      {dutch:"voor één nacht",indo:"untuk satu malam"},
+      {dutch:"voor twee nachten",indo:"untuk dua malam"},
+      {dutch:"Hoeveel kost een nacht?",indo:"Berapa harga per malam?"},
+      {dutch:"Is het ontbijt inbegrepen?",indo:"Apakah sarapan termasuk?"},
+      {dutch:"Hoe laat is het ontbijt?",indo:"Sarapan jam berapa?"},
+      {dutch:"Hoe laat moet ik uitchecken?",indo:"Jam berapa harus check-out?"},
+      {dutch:"Mag ik de wifi-code?",indo:"Boleh minta kode wifi?"},
+      {dutch:"De airco werkt niet",indo:"AC-nya tidak berfungsi"},
+      {dutch:"Het toilet is verstopt",indo:"Toilet tersumbat"},
+      {dutch:"Er is geen warm water",indo:"Tidak ada air panas"},
+      {dutch:"Mag ik een extra handdoek?",indo:"Boleh minta handuk tambahan?"},
+      {dutch:"Mag ik mijn bagage hier laten?",indo:"Boleh menitipkan bagasi di sini?"},
+      {dutch:"de receptie",indo:"resepsionis"},
+      {dutch:"de kamer",indo:"kamar"},
+      {dutch:"de sleutel",indo:"kunci"},
+      {dutch:"het bed",indo:"tempat tidur"},
+      {dutch:"de douche",indo:"shower"},
+      {dutch:"het toilet",indo:"toilet"},
+    ]
+  },
+  {
+    id:"transport", title:"Transportasi & Arah", sub:"Transport & Directions",
+    icon:"🚆", color:"linear-gradient(135deg,#06B6D4,#22D3EE)",
+    cards:[
+      {dutch:"Waar is …?",indo:"Di mana …?"},
+      {dutch:"Hoe kom ik bij …?",indo:"Bagaimana cara ke …?"},
+      {dutch:"Is het ver?",indo:"Apakah jauh?"},
+      {dutch:"Is het dichtbij?",indo:"Apakah dekat?"},
+      {dutch:"Hoe lang duurt het?",indo:"Berapa lama?"},
+      {dutch:"rechts",indo:"kanan"},
+      {dutch:"links",indo:"kiri"},
+      {dutch:"rechtdoor",indo:"lurus"},
+      {dutch:"terug",indo:"kembali"},
+      {dutch:"noord",indo:"utara"},
+      {dutch:"zuid",indo:"selatan"},
+      {dutch:"oost",indo:"timur"},
+      {dutch:"west",indo:"barat"},
+      {dutch:"het kruispunt",indo:"perempatan"},
+      {dutch:"de driesprong",indo:"pertigaan"},
+      {dutch:"de rotonde",indo:"bundaran"},
+      {dutch:"de stoplichten",indo:"lampu merah"},
+      {dutch:"de hoek",indo:"sudut / pojok"},
+      {dutch:"vervoermiddelen",indo:"alat transportasi"},
+      {dutch:"het verkeer",indo:"lalu lintas"},
+      {dutch:"veiliger",indo:"lebih aman"},
+      {dutch:"de trein",indo:"kereta"},
+      {dutch:"de bus",indo:"bis"},
+      {dutch:"de tram",indo:"trem"},
+      {dutch:"de metro",indo:"kereta bawah tanah"},
+      {dutch:"de fiets",indo:"sepeda"},
+      {dutch:"de auto",indo:"mobil"},
+      {dutch:"de taxi",indo:"taksi"},
+      {dutch:"het vliegtuig",indo:"pesawat"},
+      {dutch:"het station",indo:"stasiun"},
+      {dutch:"de halte",indo:"halte"},
+      {dutch:"de luchthaven",indo:"bandara"},
+      {dutch:"een kaartje kopen",indo:"membeli tiket"},
+      {dutch:"enkele reis",indo:"sekali jalan"},
+      {dutch:"retour",indo:"pulang-pergi"},
+      {dutch:"Welk perron?",indo:"Peron berapa?"},
+      {dutch:"Hoe laat vertrekt de trein?",indo:"Jam berapa keretanya berangkat?"},
+      {dutch:"Is deze plaats vrij?",indo:"Apakah tempat ini kosong?"},
+      {dutch:"Ik ben verdwaald",indo:"Saya tersesat"},
+      {dutch:"Kunt u het op de kaart laten zien?",indo:"Bisakah Anda tunjukkan di peta?"},
+    ]
+  },
+  {
+    id:"emergency", title:"Darurat & Kesehatan", sub:"Emergency & Health",
+    icon:"🆘", color:"linear-gradient(135deg,#EF4444,#F87171)",
+    cards:[
+      {dutch:"Help!",indo:"Tolong!"},
+      {dutch:"Bel de politie",indo:"Telepon polisi"},
+      {dutch:"Bel een ambulance",indo:"Telepon ambulans"},
+      {dutch:"Bel de brandweer",indo:"Telepon pemadam"},
+      {dutch:"Het is een noodgeval",indo:"Ini darurat"},
+      {dutch:"Ik heb een dokter nodig",indo:"Saya perlu dokter"},
+      {dutch:"Waar is het ziekenhuis?",indo:"Di mana rumah sakit?"},
+      {dutch:"Ik voel me niet goed",indo:"Saya merasa tidak enak badan"},
+      {dutch:"Ik ben ziek",indo:"Saya sakit"},
+      {dutch:"Ik ben misselijk",indo:"Saya mual"},
+      {dutch:"Ik ben verkouden",indo:"Saya pilek"},
+      {dutch:"Ik heb keelpijn",indo:"Saya sakit tenggorokan"},
+      {dutch:"Ik heb hoofdpijn",indo:"Saya sakit kepala"},
+      {dutch:"Ik heb buikpijn",indo:"Saya sakit perut"},
+      {dutch:"Ik heb kiespijn",indo:"Saya sakit gigi"},
+      {dutch:"Ik heb spierpijn",indo:"Saya sakit otot"},
+      {dutch:"Ik heb koorts",indo:"Saya demam"},
+      {dutch:"klachten",indo:"masalah / gejala"},
+      {dutch:"Wat is er aan de hand?",indo:"Ada apa? / Apa masalahnya?"},
+      {dutch:"Waar heb je last van?",indo:"Bagian mana yang sakit?"},
+      {dutch:"Hoelang hebt u deze klachten al?",indo:"Sudah berapa lama keluhannya?"},
+      {dutch:"sinds 2 dagen",indo:"sejak dua hari"},
+      {dutch:"al een week",indo:"sudah seminggu"},
+      {dutch:"pas één dag",indo:"baru satu hari"},
+      {dutch:"bewegen",indo:"bergerak",ex:"Het doet pijn als ik beweeg."},
+      {dutch:"de fysiotherapeut",indo:"fisioterapis"},
+      {dutch:"de apotheek",indo:"apotek"},
+      {dutch:"medicijnen",indo:"obat"},
+      {dutch:"een recept",indo:"resep"},
+      {dutch:"verdrietig",indo:"sedih"},
+      {dutch:"zielig",indo:"kasihan"},
+      {dutch:"Ik heb mijn paspoort verloren",indo:"Saya kehilangan paspor"},
+      {dutch:"Mijn tas is gestolen",indo:"Tas saya dicuri"},
+      {dutch:"Wat moet ik doen?",indo:"Apa yang harus saya lakukan?"},
+    ]
+  },
+  {
+    id:"weather", title:"Cuaca", sub:"Weather",
+    icon:"☀️", color:"linear-gradient(135deg,#0EA5E9,#38BDF8)",
+    cards:[
+      {dutch:"Het is zonnig",indo:"Cerah"},
+      {dutch:"Het is bewolkt",indo:"Berawan"},
+      {dutch:"Het regent",indo:"Sedang hujan"},
+      {dutch:"Het sneeuwt",indo:"Sedang turun salju"},
+      {dutch:"Het waait",indo:"Berangin"},
+      {dutch:"Het is koud",indo:"Dingin"},
+      {dutch:"Het is warm",indo:"Hangat"},
+      {dutch:"Het is heet",indo:"Panas"},
+      {dutch:"Het is mistig",indo:"Berkabut"},
+      {dutch:"Het gaat regenen",indo:"Akan hujan"},
+      {dutch:"Het wordt zonnig",indo:"Akan cerah"},
+      {dutch:"Het was bewolkt",indo:"Tadi berawan"},
+      {dutch:"Het heeft geregend",indo:"Tadi sudah hujan"},
+      {dutch:"de zomer",indo:"musim panas"},
+      {dutch:"de herfst",indo:"musim gugur"},
+      {dutch:"de winter",indo:"musim dingin"},
+      {dutch:"de lente",indo:"musim semi"},
+      {dutch:"de paraplu",indo:"payung"},
+      {dutch:"de jas",indo:"jaket / mantel"},
+      {dutch:"de regenjas",indo:"jas hujan"},
+    ]
+  },
+  /* === FROM USER'S NOTES === */
+  {
+    id:"daily", title:"Aktivitas Harian", sub:"Daily Routine — Verbs",
+    icon:"⏰", color:"linear-gradient(135deg,#14B8A6,#2DD4BF)",
+    cards:[
+      {dutch:"opstaan",indo:"bangun",ex:"Ik sta om 7 uur op."},
+      {dutch:"slapen",indo:"tidur"},
+      {dutch:"uitslapen",indo:"tidur sampai siang"},
+      {dutch:"aandoen",indo:"menyalakan / memakai",ex:"Ik doe de lamp aan."},
+      {dutch:"meenemen",indo:"membawa ikut",ex:"Ik neem mijn boek mee."},
+      {dutch:"opruimen",indo:"merapikan",ex:"Ik ruim mijn kamer op."},
+      {dutch:"noemen",indo:"menyebut / memanggil"},
+      {dutch:"eten",indo:"makan"},
+      {dutch:"drinken",indo:"minum"},
+      {dutch:"koken",indo:"memasak"},
+      {dutch:"werken",indo:"bekerja"},
+      {dutch:"studeren",indo:"belajar"},
+      {dutch:"schoonmaken",indo:"membersihkan"},
+      {dutch:"wassen",indo:"mencuci"},
+      {dutch:"douchen",indo:"mandi (shower)"},
+      {dutch:"tv kijken",indo:"menonton TV"},
+      {dutch:"lezen",indo:"membaca"},
+      {dutch:"luisteren",indo:"mendengarkan"},
+      {dutch:"praten",indo:"berbicara"},
+      {dutch:"naar huis gaan",indo:"pulang ke rumah"},
+    ]
+  },
+  {
+    id:"family", title:"Keluarga", sub:"Family",
+    icon:"👨‍👩‍👧", color:"linear-gradient(135deg,#F472B6,#EC4899)",
+    cards:[
+      {dutch:"de familie",indo:"keluarga"},
+      {dutch:"de ouders",indo:"orang tua"},
+      {dutch:"de vader",indo:"ayah"},
+      {dutch:"de moeder",indo:"ibu"},
+      {dutch:"de broer",indo:"saudara laki-laki"},
+      {dutch:"de zus",indo:"saudara perempuan"},
+      {dutch:"de zoon",indo:"anak laki-laki"},
+      {dutch:"de dochter",indo:"anak perempuan"},
+      {dutch:"de man",indo:"suami / pria"},
+      {dutch:"de vrouw",indo:"istri / wanita"},
+      {dutch:"het kind",indo:"anak"},
+      {dutch:"de kinderen",indo:"anak-anak"},
+      {dutch:"de opa",indo:"kakek"},
+      {dutch:"de oma",indo:"nenek"},
+      {dutch:"de oom",indo:"paman"},
+      {dutch:"de tante",indo:"bibi"},
+      {dutch:"de neef",indo:"sepupu / keponakan (laki)"},
+      {dutch:"de nicht",indo:"sepupu / keponakan (perempuan)"},
+      {dutch:"de gasten",indo:"tamu"},
+      {dutch:"schoonmoeder",indo:"ibu mertua"},
+      {dutch:"schoonvader",indo:"bapak mertua"},
+      {dutch:"zwager",indo:"saudara ipar (laki)"},
+      {dutch:"schoonzus",indo:"saudara ipar (perempuan)"},
+      {dutch:"verjaardag",indo:"ulang tahun"},
+      {dutch:"verjaardagsfeest",indo:"pesta ulang tahun"},
+      {dutch:"bruiloft",indo:"pernikahan"},
+      {dutch:"de scheiding",indo:"perceraian"},
+    ]
+  },
+  {
+    id:"body", title:"Tubuh & Penampilan", sub:"Body & Looks",
+    icon:"👤", color:"linear-gradient(135deg,#A855F7,#C084FC)",
+    cards:[
+      {dutch:"het hoofd",indo:"kepala"},
+      {dutch:"het gezicht",indo:"wajah"},
+      {dutch:"het haar",indo:"rambut"},
+      {dutch:"het oog / de ogen",indo:"mata"},
+      {dutch:"de neus",indo:"hidung"},
+      {dutch:"de mond",indo:"mulut"},
+      {dutch:"het oor / de oren",indo:"telinga"},
+      {dutch:"de hand",indo:"tangan"},
+      {dutch:"de voet",indo:"kaki"},
+      {dutch:"de arm",indo:"lengan"},
+      {dutch:"het been",indo:"kaki / tulang"},
+      {dutch:"de buik",indo:"perut"},
+      {dutch:"de rug",indo:"punggung"},
+      {dutch:"Hoe ziet hij eruit?",indo:"Bagaimana penampilannya?"},
+      {dutch:"Hij ziet er goed uit",indo:"Dia kelihatan bagus"},
+      {dutch:"kaal",indo:"botak"},
+      {dutch:"een snor",indo:"kumis"},
+      {dutch:"een baard",indo:"jenggot"},
+      {dutch:"dun",indo:"tipis / kurus"},
+      {dutch:"mager",indo:"kurus kering"},
+      {dutch:"dik",indo:"gemuk"},
+      {dutch:"lang",indo:"tinggi / panjang"},
+      {dutch:"klein",indo:"pendek / kecil"},
+      {dutch:"rimpels",indo:"keriput"},
+      {dutch:"lui",indo:"malas"},
+    ]
+  },
+  {
+    id:"feelings", title:"Perasaan & Pendapat", sub:"Feelings & Opinions",
+    icon:"💭", color:"linear-gradient(135deg,#FB7185,#F43F5E)",
+    cards:[
+      {dutch:"blij",indo:"senang / bahagia"},
+      {dutch:"verdrietig",indo:"sedih"},
+      {dutch:"boos",indo:"marah"},
+      {dutch:"bang",indo:"takut"},
+      {dutch:"moe",indo:"lelah"},
+      {dutch:"verveeld",indo:"bosan"},
+      {dutch:"trots",indo:"bangga"},
+      {dutch:"verbaasd",indo:"terkejut"},
+      {dutch:"verliefd",indo:"jatuh cinta"},
+      {dutch:"spannend",indo:"tegang / mendebarkan"},
+      {dutch:"benieuwd",indo:"penasaran"},
+      {dutch:"verrassing",indo:"kejutan"},
+      {dutch:"niet zo leuk",indo:"biasa saja / kurang menyenangkan"},
+      {dutch:"lusten",indo:"suka (makanan/minuman)"},
+      {dutch:"Volgens mij …",indo:"Menurut saya …"},
+      {dutch:"Trouwens …",indo:"Ngomong-ngomong …"},
+      {dutch:"Ik vind het leuk",indo:"Saya suka"},
+      {dutch:"Ik hou van …",indo:"Saya cinta / suka …"},
+      {dutch:"Ik heb zin in …",indo:"Saya ingin …"},
+      {dutch:"Ik voel me onrustig",indo:"Saya merasa gelisah"},
+    ]
+  },
+  {
+    id:"work", title:"Pekerjaan & Bisnis", sub:"Work & Business",
+    icon:"💼", color:"linear-gradient(135deg,#475569,#64748B)",
+    cards:[
+      {dutch:"diensten",indo:"jasa"},
+      {dutch:"het bedrijf",indo:"perusahaan"},
+      {dutch:"de onderneming",indo:"usaha / bisnis"},
+      {dutch:"spullen",indo:"barang-barang"},
+      {dutch:"tegenover",indo:"di seberang"},
+      {dutch:"solliciteren",indo:"melamar kerja"},
+      {dutch:"beschikbaar",indo:"tersedia"},
+      {dutch:"aanpassen",indo:"menyesuaikan"},
+      {dutch:"ervaring",indo:"pengalaman"},
+      {dutch:"opleiding",indo:"pendidikan / jurusan"},
+      {dutch:"verantwoordelijk",indo:"bertanggung jawab"},
+      {dutch:"de baan",indo:"pekerjaan"},
+      {dutch:"de collega",indo:"rekan kerja"},
+      {dutch:"de baas",indo:"bos"},
+      {dutch:"het kantoor",indo:"kantor"},
+      {dutch:"de vergadering",indo:"rapat"},
+      {dutch:"het salaris",indo:"gaji"},
+      {dutch:"het CV",indo:"CV"},
+      {dutch:"de vakantie",indo:"liburan"},
+      {dutch:"ambtenaar",indo:"pegawai negeri"},
+      {dutch:"melden",indo:"melaporkan / mendaftarkan"},
+      {dutch:"aanvragen",indo:"mengajukan"},
+      {dutch:"doorgeven",indo:"melaporkan / meneruskan"},
+    ]
+  },
+  {
+    id:"personality", title:"Sifat & Kepribadian", sub:"Personality",
+    icon:"✨", color:"linear-gradient(135deg,#0891B2,#06B6D4)",
+    cards:[
+      {dutch:"eerlijk",indo:"jujur"},
+      {dutch:"zorgzaam",indo:"penyayang / penuh perhatian"},
+      {dutch:"nauwkeurig",indo:"teliti"},
+      {dutch:"geduldig",indo:"sabar"},
+      {dutch:"ordelijk",indo:"rapi / teratur"},
+      {dutch:"onrustig",indo:"gelisah"},
+      {dutch:"vriendelijk",indo:"ramah"},
+      {dutch:"aardig",indo:"baik / ramah"},
+      {dutch:"slim",indo:"pintar"},
+      {dutch:"grappig",indo:"lucu"},
+      {dutch:"verlegen",indo:"pemalu"},
+      {dutch:"sociaal",indo:"suka bergaul"},
+      {dutch:"actief",indo:"aktif"},
+      {dutch:"creatief",indo:"kreatif"},
+      {dutch:"behulpzaam",indo:"suka menolong"},
+    ]
+  },
+  {
+    id:"time", title:"Kata Waktu", sub:"Time Words",
+    icon:"🕐", color:"linear-gradient(135deg,#84CC16,#A3E635)",
+    cards:[
+      {dutch:"eerst",indo:"pertama"},
+      {dutch:"daarna",indo:"kemudian / lalu"},
+      {dutch:"vervolgens",indo:"selanjutnya"},
+      {dutch:"ten slotte",indo:"akhirnya"},
+      {dutch:"straks",indo:"nanti"},
+      {dutch:"nu",indo:"sekarang"},
+      {dutch:"ooit",indo:"pernah (dalam hidup)",ex:"Ben je ooit in Bali geweest?"},
+      {dutch:"eerder",indo:"sebelumnya / lebih awal"},
+      {dutch:"later",indo:"nanti / lebih akhir"},
+      {dutch:"meteen",indo:"langsung / segera"},
+      {dutch:"net",indo:"baru saja"},
+      {dutch:"vaak",indo:"sering"},
+      {dutch:"soms",indo:"kadang-kadang"},
+      {dutch:"nooit",indo:"tidak pernah"},
+      {dutch:"altijd",indo:"selalu"},
+      {dutch:"meestal",indo:"biasanya"},
+      {dutch:"onregelmatig",indo:"tidak teratur"},
+      {dutch:"elk weekend",indo:"setiap akhir pekan"},
+      {dutch:"een uurtje",indo:"kira-kira sejam"},
+      {dutch:"afgelopen",indo:"yang lalu / sudah lewat"},
+      {dutch:"nog steeds",indo:"masih"},
+    ]
+  },
+  {
+    id:"phrases", title:"Frasa Sehari-hari", sub:"Everyday Phrases",
+    icon:"💬", color:"linear-gradient(135deg,#F97316,#FB923C)",
+    cards:[
+      {dutch:"Doe in …",indo:"Masukkan ke dalam …",ex:"Doe de sleutel in je tas."},
+      {dutch:"Ga maar zitten",indo:"Silakan duduk"},
+      {dutch:"Ga maar liggen",indo:"Silakan berbaring"},
+      {dutch:"Ga maar hangen",indo:"Silakan digantung"},
+      {dutch:"tegen",indo:"bersandar / melawan / ke arah"},
+      {dutch:"gooien",indo:"melempar"},
+      {dutch:"sloot",indo:"selokan / parit kecil"},
+      {dutch:"zit in",indo:"berada di dalam"},
+      {dutch:"Wat is er gebeurd?",indo:"Apa yang terjadi?"},
+      {dutch:"waarover",indo:"tentang apa"},
+      {dutch:"Het hangt af van …",indo:"Itu tergantung pada …"},
+      {dutch:"afhankelijk",indo:"tergantung"},
+      {dutch:"vaste",indo:"tetap"},
+      {dutch:"Sterkte ermee!",indo:"Semangat ya!"},
+      {dutch:"hoeveel",indo:"berapa banyak"},
+      {dutch:"aantal",indo:"jumlah"},
+      {dutch:"afrekenen",indo:"membayar / melunasi"},
+      {dutch:"bagage",indo:"barang bawaan"},
+      {dutch:"uitgaan",indo:"keluar / pergi keluar"},
+      {dutch:"handelen",indo:"bertindak"},
+      {dutch:"maat",indo:"ukuran"},
+      {dutch:"afval",indo:"sampah"},
+      {dutch:"waterafvoer",indo:"saluran air"},
+      {dutch:"onderwerpen",indo:"topik"},
+      {dutch:"ingewikkeld",indo:"rumit"},
+      {dutch:"waarschijnlijk",indo:"kemungkinan / mungkin"},
+    ]
+  },
+  {
+    id:"modal", title:"Kata Kerja Modal", sub:"Modal Verbs",
+    icon:"📚", color:"linear-gradient(135deg,#6366F1,#818CF8)",
+    cards:[
+      {dutch:"willen — ik wil",indo:"ingin — saya ingin",ex:"Ik wil water drinken."},
+      {dutch:"willen — wilt u",indo:"ingin (formal) — Anda ingin",ex:"Wilt u zitten?"},
+      {dutch:"willen — wij willen",indo:"ingin (jamak) — kami ingin"},
+      {dutch:"kunnen — ik kan",indo:"bisa — saya bisa",ex:"Ik kan zwemmen."},
+      {dutch:"kunnen — kunt u",indo:"bisa (formal) — Anda bisa",ex:"Kunt u helpen?"},
+      {dutch:"kunnen — wij kunnen",indo:"bisa (jamak) — kami bisa"},
+      {dutch:"zullen — ik zal",indo:"akan — saya akan",ex:"Ik zal later bellen."},
+      {dutch:"zullen — je zult",indo:"akan — kamu akan"},
+      {dutch:"zullen — wij zullen",indo:"akan (jamak) — kami akan"},
+      {dutch:"moeten — ik moet",indo:"harus — saya harus"},
+      {dutch:"mogen — mag ik?",indo:"boleh — boleh saya?"},
+      {dutch:"gaan + infinitief",indo:"akan melakukan",ex:"Ik ga koken — Saya akan memasak."},
+      {dutch:"aan het + infinitief",indo:"sedang melakukan",ex:"Ik ben aan het studeren."},
+    ]
+  },
+  {
+    id:"perfectum", title:"Past Tense (Perfectum)", sub:"hebben/zijn + ge-...-t/d",
+    icon:"🔄", color:"linear-gradient(135deg,#DC2626,#EF4444)",
+    cards:[
+      {dutch:"Ik heb gegeten",indo:"Saya sudah makan"},
+      {dutch:"Ik heb gedronken",indo:"Saya sudah minum"},
+      {dutch:"Ik heb gewerkt",indo:"Saya sudah bekerja"},
+      {dutch:"Ik heb geslapen",indo:"Saya sudah tidur"},
+      {dutch:"Ik heb gestudeerd",indo:"Saya sudah belajar"},
+      {dutch:"Ik heb koffie gedronken",indo:"Saya sudah minum kopi"},
+      {dutch:"Ik ben gegaan",indo:"Saya sudah pergi"},
+      {dutch:"Ik ben gekomen",indo:"Saya sudah datang"},
+      {dutch:"Hij is gevallen",indo:"Dia jatuh"},
+      {dutch:"Ik ben naar huis gegaan",indo:"Saya sudah pulang"},
+      {dutch:"Ik ben naar Bali geweest",indo:"Saya sudah pernah ke Bali"},
+      {dutch:"hebben + ge-...-t/d",indo:"untuk aksi normal"},
+      {dutch:"zijn + ge-...-t/d",indo:"untuk gerakan / perubahan"},
+      {dutch:"gisteren werkte ik",indo:"kemarin saya bekerja (imperfect)"},
+      {dutch:"gebeurd",indo:"terjadi"},
+    ]
+  },
+  {
+    id:"sentence", title:"Struktur Kalimat", sub:"Sentence Structure",
+    icon:"📐", color:"linear-gradient(135deg,#0F766E,#14B8A6)",
+    cards:[
+      {dutch:"Eerst eet ik ontbijt.",indo:"Pertama, saya sarapan."},
+      {dutch:"Daarna ga ik werken.",indo:"Kemudian, saya pergi bekerja."},
+      {dutch:"Ten slotte ga ik slapen.",indo:"Akhirnya, saya tidur."},
+      {dutch:"[Tijd] + [Verb] + [Subject] + [Rest]",indo:"Pola: Waktu + Kata Kerja + Subjek + Sisanya"},
+      {dutch:"Ik sta om 7 uur op.",indo:"Saya bangun jam 7. (verb terpisah)"},
+      {dutch:"Ik doe de lamp aan.",indo:"Saya menyalakan lampu."},
+      {dutch:"Ik neem mijn boek mee.",indo:"Saya membawa buku saya."},
+      {dutch:"Ik heb het boek niet.",indo:"Saya tidak punya bukunya. (niet untuk de/het)"},
+      {dutch:"Ik heb geen boeken.",indo:"Saya tidak punya buku. (geen untuk tanpa artikel/jamak)"},
+      {dutch:"Ik eet bij Maria.",indo:"Saya makan di tempat Maria."},
+      {dutch:"Om 6 uur komt Johan eten.",indo:"Jam 6 Johan datang makan."},
+      {dutch:"Ik ben aan het studeren.",indo:"Saya sedang belajar."},
+      {dutch:"Wat ben je aan het doen?",indo:"Apa yang sedang kamu lakukan?"},
+      {dutch:"Ik ga straks koken.",indo:"Saya akan memasak nanti."},
+    ]
+  },
+];
+
+// Auto-assign card ids
+DECKS.forEach(d=>d.cards.forEach((c,i)=>c.id=`${d.id}-${i}`));
+
+const ALL_CARDS_COUNT = DECKS.reduce((s,d)=>s+d.cards.length,0);
+
+/* =========================================================
+   STATE & PERSISTENCE
+   ========================================================= */
+const STORAGE_KEY = "belandaku_v1";
+const SETTINGS_KEY = "belandaku_settings_v1";
+
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); }
+  catch(e){ return {}; }
+}
+function saveProgress(p){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }catch(e){}
+}
+function loadSettings(){
+  try{ return Object.assign({direction:"nl-id",dark:false,shuffle:true},JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}")); }
+  catch(e){ return {direction:"nl-id",dark:false,shuffle:true}; }
+}
+function saveSettings(s){
+  try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify(s)); }catch(e){}
+}
+
+let progress = loadProgress();   // { deckId: { learned:[ids], starred:[ids], best:{matchSec:n,testScore:n} } }
+let settings = loadSettings();
+
+function getDeckProgress(deckId){
+  if(!progress[deckId]) progress[deckId] = { learned:[], starred:[], best:{} };
+  return progress[deckId];
+}
+function isLearned(deckId, cardId){ return getDeckProgress(deckId).learned.includes(cardId); }
+function markLearned(deckId, cardId, val=true){
+  const p = getDeckProgress(deckId);
+  const idx = p.learned.indexOf(cardId);
+  if(val && idx<0) p.learned.push(cardId);
+  if(!val && idx>=0) p.learned.splice(idx,1);
+  saveProgress(progress);
+}
+function isStarred(deckId, cardId){ return getDeckProgress(deckId).starred.includes(cardId); }
+function toggleStarred(deckId, cardId){
+  const p = getDeckProgress(deckId);
+  const idx = p.starred.indexOf(cardId);
+  if(idx<0) p.starred.push(cardId); else p.starred.splice(idx,1);
+  saveProgress(progress);
+}
+
+function applyTheme(){
+  document.documentElement.dataset.theme = settings.dark ? "dark" : "light";
+}
+applyTheme();
+
+/* =========================================================
+   ROUTING / SCREENS
+   ========================================================= */
+const app = document.getElementById("app");
+let currentScreen = {name:"home"};
+
+function go(screen){
+  currentScreen = screen;
+  render();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+window.addEventListener("popstate",e=>{
+  if(currentScreen.name!=="home") go({name:"home"});
+});
+
+/* Helpers */
+function shuffle(arr){
+  arr = arr.slice();
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
   }
-    </script>
+  return arr;
+}
+function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function normalize(s){
+  return String(s).toLowerCase()
+    .replace(/[‘’']/g,"'")
+    .replace(/[.,!?;:()"]/g,"")
+    .replace(/\s+/g," ")
+    .replace(/\bhet\b|\bde\b|\been\b/g,"")  // forgive missing articles
+    .trim();
+}
+function answersMatch(user, target){
+  user = normalize(user); target = normalize(target);
+  if(!user) return false;
+  if(user===target) return true;
+  // also accept the first variant if target has " / " or " — "
+  for(const v of target.split(/\s*[\/—\-]\s*/)){
+    if(normalize(v)===user) return true;
+  }
+  return false;
+}
+
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "nl-NL";
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render(){
+  if(currentScreen.name==="home") renderHome();
+  else if(currentScreen.name==="deck") renderDeck();
+  else if(currentScreen.name==="flashcards") renderFlashcards();
+  else if(currentScreen.name==="learn") renderLearn();
+  else if(currentScreen.name==="match") renderMatch();
+  else if(currentScreen.name==="write") renderWrite();
+  else if(currentScreen.name==="test") renderTest();
+}
+
+/* ----- HOME ----- */
+function renderHome(){
+  const totalLearned = Object.values(progress).reduce((s,p)=>s+(p.learned?.length||0),0);
+  const totalStarred = Object.values(progress).reduce((s,p)=>s+(p.starred?.length||0),0);
+  const search = currentScreen.search || "";
+  const visibleDecks = !search ? DECKS : DECKS.filter(d=>{
+    const q = search.toLowerCase();
+    if(d.title.toLowerCase().includes(q) || d.sub.toLowerCase().includes(q)) return true;
+    return d.cards.some(c=>c.dutch.toLowerCase().includes(q)||c.indo.toLowerCase().includes(q));
+  });
+
+  app.innerHTML = `
+    <div class="topbar">
+      <h1>Belanda<span class="accent">Ku</span></h1>
+      <div class="topbar-right">
+        <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙️</button>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h2>Belajar Bahasa Belanda</h2>
+      <p class="title">Halo, Susan 👋</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><strong>${ALL_CARDS_COUNT}</strong>Total kartu</div>
+        <div class="hero-stat"><strong>${totalLearned}</strong>Sudah hafal</div>
+        <div class="hero-stat"><strong>${totalStarred}</strong>⭐ Favorit</div>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Cari kata atau topik..." value="${escHtml(search)}" />
+    </div>
+
+    <div class="section-title">
+      <span>Topik (${visibleDecks.length})</span>
+      <span class="muted">${settings.direction==="nl-id"?"NL → ID":"ID → NL"}</span>
+    </div>
+
+    <div class="deck-grid">
+      ${visibleDecks.map(d=>{
+        const p = getDeckProgress(d.id);
+        const pct = Math.round((p.learned.length / d.cards.length)*100);
+        return `
+          <button class="deck-card fade-in" data-deck="${d.id}">
+            <div class="deck-icon" style="background:${d.color}">${d.icon}</div>
+            <div class="deck-title">${escHtml(d.title)}</div>
+            <div class="deck-sub">${escHtml(d.sub)}</div>
+            <div class="deck-meta">
+              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+              <span>${d.cards.length}</span>
+            </div>
+          </button>`;
+      }).join("")}
+      ${visibleDecks.length===0?`<div class="empty" style="grid-column:1/-1"><div class="emoji">🔍</div>Tidak ada hasil untuk "${escHtml(search)}"</div>`:""}
+    </div>
+
+    ${renderDrawer()}
+  `;
+
+  document.getElementById("searchInput").addEventListener("input",e=>{
+    currentScreen.search = e.target.value;
+    // re-render only the grid for snappier UX, but full render is fine
+    renderHome();
+    document.getElementById("searchInput").focus();
+  });
+  document.querySelectorAll(".deck-card").forEach(el=>{
+    el.addEventListener("click",()=>{
+      go({name:"deck", deckId: el.dataset.deck});
+    });
+  });
+  wireDrawer();
+}
+
+/* ----- DECK DETAIL ----- */
+function renderDeck(){
+  const deck = DECKS.find(d=>d.id===currentScreen.deckId);
+  if(!deck) return go({name:"home"});
+  const p = getDeckProgress(deck.id);
+
+  app.innerHTML = `
+    <div class="nav">
+      <button class="back-btn" id="backBtn" aria-label="Back">←</button>
+      <div>
+        <div class="nav-title">${escHtml(deck.title)}</div>
+        <div class="nav-sub">${deck.cards.length} kartu</div>
+      </div>
+    </div>
+
+    <div class="deck-header" style="background:${deck.color}">
+      <h2>${deck.icon} ${escHtml(deck.title)}</h2>
+      <p>${escHtml(deck.sub)}</p>
+      <div class="deck-header-stats">
+        <div class="chip">${p.learned.length} / ${deck.cards.length} hafal</div>
+        <div class="chip">⭐ ${p.starred.length}</div>
+      </div>
+    </div>
+
+    <div class="modes">
+      <button class="mode-card" data-mode="flashcards">
+        <div class="mode-icon">📇</div>
+        <div class="mode-info"><h3>Kartu Flash</h3><p>Bolak-balik kartu, geser untuk menandai</p></div>
+        <div class="mode-arrow">›</div>
+      </button>
+      <button class="mode-card" data-mode="learn">
+        <div class="mode-icon">🧠</div>
+        <div class="mode-info"><h3>Belajar</h3><p>Quiz pilihan ganda adaptif</p></div>
+        <div class="mode-arrow">›</div>
+      </button>
+      <button class="mode-card" data-mode="match">
+        <div class="mode-icon">🎯</div>
+        <div class="mode-info"><h3>Cocokkan</h3><p>Pasangkan kata Belanda ↔ Indonesia${p.best.matchSec?` · best: ${p.best.matchSec}s`:""}</p></div>
+        <div class="mode-arrow">›</div>
+      </button>
+      <button class="mode-card" data-mode="write">
+        <div class="mode-icon">✍️</div>
+        <div class="mode-info"><h3>Tulis</h3><p>Ketik terjemahan dengan tangan</p></div>
+        <div class="mode-arrow">›</div>
+      </button>
+      <button class="mode-card" data-mode="test">
+        <div class="mode-icon">📝</div>
+        <div class="mode-info"><h3>Tes</h3><p>10 soal campuran, dengan nilai${p.best.testScore?` · best: ${p.best.testScore}/10`:""}</p></div>
+        <div class="mode-arrow">›</div>
+      </button>
+    </div>
+
+    <div class="section-title" style="margin-top:24px"><span>Semua kartu</span></div>
+    <div class="cards-list">
+      ${deck.cards.map(c=>`
+        <div class="card-row">
+          <div style="flex:1;min-width:0">
+            <div class="term">${escHtml(c.dutch)}</div>
+            <div class="def">${escHtml(c.indo)}</div>
+          </div>
+          ${isLearned(deck.id,c.id)?'<span style="color:var(--success);font-size:18px">✓</span>':''}
+          <button class="star-btn ${isStarred(deck.id,c.id)?"active":""}" data-star="${c.id}">${isStarred(deck.id,c.id)?"⭐":"☆"}</button>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  document.getElementById("backBtn").addEventListener("click",()=>go({name:"home"}));
+  document.querySelectorAll(".mode-card").forEach(el=>{
+    el.addEventListener("click",()=>go({name:el.dataset.mode, deckId:deck.id}));
+  });
+  document.querySelectorAll(".star-btn").forEach(el=>{
+    el.addEventListener("click",e=>{
+      e.stopPropagation();
+      toggleStarred(deck.id, el.dataset.star);
+      renderDeck();
+    });
+  });
+}
+
+/* ----- FLASHCARDS ----- */
+function renderFlashcards(){
+  const deck = DECKS.find(d=>d.id===currentScreen.deckId);
+  if(!deck) return go({name:"home"});
+
+  if(!currentScreen.cards){
+    currentScreen.cards = settings.shuffle ? shuffle(deck.cards) : deck.cards.slice();
+    currentScreen.idx = 0;
+    currentScreen.flipped = false;
+    currentScreen.gotIt = 0;
+    currentScreen.notYet = 0;
+  }
+
+  const total = currentScreen.cards.length;
+  const i = currentScreen.idx;
+
+  if(i >= total){
+    // done screen
+    app.innerHTML = `
+      <div class="nav">
+        <button class="back-btn" onclick="go({name:'deck',deckId:'${deck.id}'})">←</button>
+        <div class="nav-title">Selesai!</div>
+      </div>
+      <div class="done-screen">
+        <div class="emoji">🎉</div>
+        <h2>Selesai sesi!</h2>
+        <p>Kamu sudah melewati ${total} kartu</p>
+        <div style="display:flex;gap:14px;justify-content:center;margin-bottom:24px">
+          <div class="chip" style="background:var(--success-light);color:var(--success)">✓ ${currentScreen.gotIt} hafal</div>
+          <div class="chip" style="background:var(--danger-light);color:var(--danger)">↻ ${currentScreen.notYet} ulang</div>
+        </div>
+        <div class="done-actions">
+          <button class="primary-btn" onclick="currentScreen={name:'flashcards',deckId:'${deck.id}'};render()">Ulangi</button>
+          <button class="ghost-btn" onclick="go({name:'deck',deckId:'${deck.id}'})">Kembali</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const card = currentScreen.cards[i];
+  const dir = settings.direction;
+  const front = dir==="nl-id" ? card.dutch : card.indo;
+  const back = dir==="nl-id" ? card.indo : card.dutch;
+  const frontLang = dir==="nl-id" ? "Belanda" : "Indonesia";
+  const backLang = dir==="nl-id" ? "Indonesia" : "Belanda";
+
+  app.innerHTML = `
+    <div class="nav">
+      <button class="back-btn" id="backBtn">←</button>
+      <div class="nav-title">${escHtml(deck.title)}</div>
+      <button class="icon-btn" id="dirBtn" title="Balik arah">${dir==="nl-id"?"🇳🇱→🇮🇩":"🇮🇩→🇳🇱"}</button>
+    </div>
+
+    <div class="mode-screen">
+      <div class="topbar-mode">
+        <div class="progress-bar"><div class="progress-fill" style="width:${(i/total)*100}%"></div></div>
+        <div class="progress-text">${i+1}/${total}</div>
+      </div>
+
+      <div class="fc-stage">
+        <div class="fc-card ${currentScreen.flipped?"flipped":""}" id="fcCard">
+          <div class="fc-face front">
+            <div class="lang-tag">${frontLang}</div>
+            <button class="fc-speak" id="speakFront">🔊</button>
+            <div class="fc-text">${escHtml(front)}</div>
+            ${card.ex && dir==="nl-id" ? `<div class="fc-example">${escHtml(card.ex)}</div>`:""}
+            <div class="fc-hint">Tap untuk membalik</div>
+          </div>
+          <div class="fc-face back">
+            <div class="lang-tag">${backLang}</div>
+            <button class="fc-speak" id="speakBack">🔊</button>
+            <div class="fc-text">${escHtml(back)}</div>
+            ${card.ex && dir==="id-nl" ? `<div class="fc-example">${escHtml(card.ex)}</div>`:""}
+            <div class="fc-hint">Tap untuk membalik</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fc-controls">
+        <button class="fc-btn no" id="noBtn">↻ Ulang</button>
+        <button class="fc-btn skip" id="starBtn">${isStarred(deck.id,card.id)?"⭐":"☆"}</button>
+        <button class="fc-btn yes" id="yesBtn">✓ Hafal</button>
+      </div>
+    </div>
+  `;
+
+  const fc = document.getElementById("fcCard");
+  fc.addEventListener("click",e=>{
+    if(e.target.closest(".fc-speak")) return;
+    currentScreen.flipped = !currentScreen.flipped;
+    fc.classList.toggle("flipped");
+  });
+
+  document.getElementById("speakFront").addEventListener("click",e=>{
+    e.stopPropagation();
+    speak(dir==="nl-id" ? card.dutch : card.indo);
+  });
+  document.getElementById("speakBack").addEventListener("click",e=>{
+    e.stopPropagation();
+    speak(dir==="id-nl" ? card.dutch : card.indo);
+  });
+
+  function advance(known){
+    if(known){
+      markLearned(deck.id, card.id, true);
+      currentScreen.gotIt++;
+      fc.classList.add("swipe-yes");
+    } else {
+      currentScreen.notYet++;
+      fc.classList.add("swipe-no");
+    }
+    setTimeout(()=>{
+      currentScreen.idx++;
+      currentScreen.flipped = false;
+      render();
+    }, 320);
+  }
+
+  document.getElementById("yesBtn").addEventListener("click",()=>advance(true));
+  document.getElementById("noBtn").addEventListener("click",()=>advance(false));
+  document.getElementById("starBtn").addEventListener("click",()=>{
+    toggleStarred(deck.id, card.id);
+    render();
+  });
+  document.getElementById("backBtn").addEventListener("click",()=>{
+    currentScreen.cards = null;
+    go({name:"deck", deckId:deck.id});
+  });
+  document.getElementById("dirBtn").addEventListener("click",()=>{
+    settings.direction = settings.direction==="nl-id" ? "id-nl" : "nl-id";
+    saveSettings(settings);
+    render();
+  });
+
+  // Touch swipe
+  let startX=0, startY=0, dragging=false;
+  fc.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1) return;
+    startX = e.touches[0].clientX; startY=e.touches[0].clientY; dragging=true;
+  },{passive:true});
+  fc.addEventListener("touchmove",e=>{
+    if(!dragging) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if(Math.abs(dx) > 16 && Math.abs(dx) > Math.abs(dy)){
+      fc.style.transform = `${currentScreen.flipped?"rotateY(180deg) ":""}translateX(${dx}px) rotate(${dx*0.04}deg)`;
+    }
+  },{passive:true});
+  fc.addEventListener("touchend",e=>{
+    if(!dragging) return;
+    dragging=false;
+    const endX = e.changedTouches[0].clientX;
+    const dx = endX - startX;
+    fc.style.transform = "";
+    if(Math.abs(dx) > 80){
+      advance(dx > 0); // right=know it
+    }
+  });
+}
+
+/* ----- LEARN MODE (adaptive MC + typing) ----- */
+function renderLearn(){
+  const deck = DECKS.find(d=>d.id===currentScreen.deckId);
+  if(!deck) return go({name:"home"});
+
+  if(!currentScreen.queue){
+    // build queue: each card needs 2 correct in a row to graduate
+    currentScreen.queue = shuffle(deck.cards).map(c=>({card:c, streak:0, mode:"mc"}));
+    currentScreen.total = deck.cards.length;
+    currentScreen.done = 0;
+    currentScreen.locked = false;
+  }
+
+  if(currentScreen.queue.length===0){
+    app.innerHTML = `
+      <div class="nav">
+        <button class="back-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">←</button>
+        <div class="nav-title">Selesai!</div>
+      </div>
+      <div class="done-screen">
+        <div class="emoji">🏆</div>
+        <h2>Hebat!</h2>
+        <p>Semua ${currentScreen.total} kartu sudah dikuasai</p>
+        <div class="done-actions">
+          <button class="primary-btn" onclick="currentScreen={name:'learn',deckId:'${deck.id}'};render()">Mulai lagi</button>
+          <button class="ghost-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">Kembali</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const item = currentScreen.queue[0];
+  const card = item.card;
+  const dir = settings.direction;
+  const prompt = dir==="nl-id" ? card.dutch : card.indo;
+  const target = dir==="nl-id" ? card.indo : card.dutch;
+  const promptLang = dir==="nl-id" ? "🇳🇱 Belanda" : "🇮🇩 Indonesia";
+  const targetLang = dir==="nl-id" ? "Indonesia" : "Belanda";
+  const progressPct = (currentScreen.done / currentScreen.total) * 100;
+
+  let optionsHtml = "";
+  if(item.mode === "mc"){
+    // pick 3 random distractors from same deck
+    const others = shuffle(deck.cards.filter(c=>c.id!==card.id)).slice(0,3);
+    const opts = shuffle([card, ...others]);
+    item._opts = opts; // remember for grading
+    optionsHtml = `
+      <div class="learn-options">
+        ${opts.map((c,n)=>{
+          const txt = dir==="nl-id" ? c.indo : c.dutch;
+          return `<button class="learn-option" data-cid="${c.id}"><span class="num">${n+1}</span><span>${escHtml(txt)}</span></button>`;
+        }).join("")}
+      </div>`;
+  } else {
+    optionsHtml = `
+      <div class="learn-typing">
+        <input id="typeInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Ketik terjemahan dalam ${targetLang}..." />
+        <div class="learn-feedback" id="feedback"></div>
+        <button class="primary-btn" id="checkBtn">Periksa</button>
+      </div>`;
+  }
+
+  app.innerHTML = `
+    <div class="nav">
+      <button class="back-btn" id="backBtn">←</button>
+      <div class="nav-title">${escHtml(deck.title)} · Belajar</div>
+    </div>
+
+    <div class="mode-screen">
+      <div class="topbar-mode">
+        <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+        <div class="progress-text">${currentScreen.done}/${currentScreen.total}</div>
+      </div>
+
+      <div class="learn-prompt">
+        <div class="small">${promptLang}${item.mode==="type"?" · ketik jawaban":""}</div>
+        <div class="word">${escHtml(prompt)}</div>
+        <button class="speak-btn" id="speakBtn" aria-label="Speak">🔊</button>
+      </div>
+
+      ${optionsHtml}
+    </div>
+  `;
+
+  document.getElementById("backBtn").addEventListener("click",()=>{
+    currentScreen.queue = null;
+    go({name:"deck", deckId:deck.id});
+  });
+  document.getElementById("speakBtn").addEventListener("click",()=>speak(card.dutch));
+
+  if(item.mode === "mc"){
+    document.querySelectorAll(".learn-option").forEach(el=>{
+      el.addEventListener("click",()=>{
+        if(currentScreen.locked) return;
+        currentScreen.locked = true;
+        const correct = el.dataset.cid === card.id;
+        document.querySelectorAll(".learn-option").forEach(x=>{
+          if(x.dataset.cid === card.id) x.classList.add("correct");
+          else if(x===el && !correct) x.classList.add("wrong");
+        });
+        finishItem(correct);
+      });
+    });
+  } else {
+    const input = document.getElementById("typeInput");
+    const fb = document.getElementById("feedback");
+    const wrap = input.parentElement;
+    const check = ()=>{
+      if(currentScreen.locked) return;
+      const v = input.value;
+      const correct = answersMatch(v, target);
+      currentScreen.locked = true;
+      if(correct){
+        wrap.classList.add("correct");
+        fb.textContent = "Bagus! ✓";
+        fb.className = "learn-feedback correct show";
+      } else {
+        wrap.classList.add("wrong");
+        fb.innerHTML = `Jawaban benar: <strong>${escHtml(target)}</strong>`;
+        fb.className = "learn-feedback wrong show";
+      }
+      finishItem(correct);
+    };
+    document.getElementById("checkBtn").addEventListener("click",check);
+    input.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); });
+    setTimeout(()=>input.focus(),100);
+  }
+}
+function finishItem(correct){
+  setTimeout(()=>{
+    const item = currentScreen.queue.shift();
+    if(correct){
+      item.streak++;
+      if(item.streak >= 2){
+        // graduated
+        markLearned(currentScreen.deckId, item.card.id, true);
+        currentScreen.done++;
+      } else {
+        // upgrade to typing after first MC correct
+        item.mode = "type";
+        // requeue further back
+        const insertAt = Math.min(currentScreen.queue.length, 3 + Math.floor(Math.random()*4));
+        currentScreen.queue.splice(insertAt, 0, item);
+      }
+    } else {
+      item.streak = 0;
+      item.mode = "mc"; // back to easier
+      const insertAt = Math.min(currentScreen.queue.length, 2 + Math.floor(Math.random()*3));
+      currentScreen.queue.splice(insertAt, 0, item);
+    }
+    currentScreen.locked = false;
+    render();
+  }, correct ? 700 : 1700);
+}
+
+/* ----- MATCH MODE ----- */
+function renderMatch(){
+  const deck = DECKS.find(d=>d.id===currentScreen.deckId);
+  if(!deck) return go({name:"home"});
+
+  if(!currentScreen.tiles){
+    const pool = shuffle(deck.cards).slice(0, Math.min(6, deck.cards.length));
+    const tiles = [];
+    pool.forEach((c,i)=>{
+      tiles.push({id:`d${i}`, cid:c.id, text:c.dutch, side:"d"});
+      tiles.push({id:`i${i}`, cid:c.id, text:c.indo, side:"i"});
+    });
+    currentScreen.tiles = shuffle(tiles);
+    currentScreen.matched = [];
+    currentScreen.selected = [];
+    currentScreen.start = Date.now();
+    currentScreen.locked = false;
+    if(currentScreen.timerInt) clearInterval(currentScreen.timerInt);
+    currentScreen.timerInt = setInterval(()=>{
+      const el = document.getElementById("timer");
+      if(el) el.textContent = ((Date.now()-currentScreen.start)/1000).toFixed(1)+"s";
+    }, 100);
+  }
+
+  const total = currentScreen.tiles.length;
+  const allMatched = currentScreen.matched.length === total;
+
+  if(allMatched){
+    clearInterval(currentScreen.timerInt);
+    const elapsed = ((Date.now()-currentScreen.start)/1000).toFixed(1);
+    const elapsedNum = parseFloat(elapsed);
+    const p = getDeckProgress(deck.id);
+    if(!p.best.matchSec || elapsedNum < p.best.matchSec){
+      p.best.matchSec = elapsedNum;
+      saveProgress(progress);
+    }
+    app.innerHTML = `
+      <div class="nav">
+        <button class="back-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">←</button>
+        <div class="nav-title">Cocokkan</div>
+      </div>
+      <div class="done-screen">
+        <div class="emoji">⚡</div>
+        <h2>${elapsed} detik</h2>
+        <p>${p.best.matchSec===elapsedNum?"Rekor baru! 🏆":`Best: ${p.best.matchSec}s`}</p>
+        <div class="done-actions">
+          <button class="primary-btn" onclick="currentScreen={name:'match',deckId:'${deck.id}'};render()">Main lagi</button>
+          <button class="ghost-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">Kembali</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  app.innerHTML = `
+    <div class="nav">
+      <button class="back-btn" id="backBtn">←</button>
+      <div class="nav-title">${escHtml(deck.title)} · Cocokkan</div>
+    </div>
+
+    <div class="mode-screen">
+      <div class="match-bar">
+        <div><div class="label">Waktu</div><div class="timer" id="timer">0.0s</div></div>
+        <div style="text-align:right"><div class="label">Cocok</div><div class="timer">${currentScreen.matched.length/2}/${total/2}</div></div>
+      </div>
+
+      <div class="match-grid">
+        ${currentScreen.tiles.map(t=>{
+          const matched = currentScreen.matched.includes(t.id);
+          const selected = currentScreen.selected.includes(t.id);
+          const wrong = currentScreen.wrong && currentScreen.wrong.includes(t.id);
+          return `<button class="match-tile ${matched?"matched":""} ${selected?"selected":""} ${wrong?"wrong":""}" data-tile="${t.id}">${escHtml(t.text)}</button>`;
+        }).join("")}
+      </div>
+    </div>
+  `;
+
+  document.getElementById("backBtn").addEventListener("click",()=>{
+    clearInterval(currentScreen.timerInt);
+    currentScreen.tiles = null;
+    go({name:"deck", deckId:deck.id});
+  });
+
+  document.querySelectorAll(".match-tile").forEach(el=>{
+    el.addEventListener("click",()=>{
+      if(currentScreen.locked) return;
+      const tid = el.dataset.tile;
+      if(currentScreen.matched.includes(tid)) return;
+      if(currentScreen.selected.includes(tid)){
+        // deselect
+        currentScreen.selected = currentScreen.selected.filter(x=>x!==tid);
+        return render();
+      }
+      currentScreen.selected.push(tid);
+      if(currentScreen.selected.length===2){
+        const [aId,bId] = currentScreen.selected;
+        const a = currentScreen.tiles.find(t=>t.id===aId);
+        const b = currentScreen.tiles.find(t=>t.id===bId);
+        if(a.cid===b.cid && a.side!==b.side){
+          currentScreen.matched.push(aId,bId);
+          currentScreen.selected = [];
+          render();
+        } else {
+          currentScreen.locked = true;
+          currentScreen.wrong = [aId,bId];
+          render();
+          setTimeout(()=>{
+            currentScreen.selected = [];
+            currentScreen.wrong = null;
+            currentScreen.locked = false;
+            render();
+          }, 600);
+        }
+      } else {
+        render();
+      }
+    });
+  });
+}
+
+/* ----- WRITE MODE ----- */
+function renderWrite(){
+  const deck = DECKS.find(d=>d.id===currentScreen.deckId);
+  if(!deck) return go({name:"home"});
+
+  if(!currentScreen.cards){
+    currentScreen.cards = shuffle(deck.cards);
+    currentScreen.idx = 0;
+    currentScreen.right = 0;
+    currentScreen.wrong = 0;
+    currentScreen.checked = false;
+  }
+  const i = currentScreen.idx, total = currentScreen.cards.length;
+  if(i>=total){
+    app.innerHTML = `
+      <div class="nav"><button class="back-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">←</button><div class="nav-title">Selesai!</div></div>
+      <div class="done-screen">
+        <div class="emoji">✍️</div>
+        <h2>${currentScreen.right}/${total}</h2>
+        <p>kartu dijawab benar</p>
+        <div class="done-actions">
+          <button class="primary-btn" onclick="currentScreen={name:'write',deckId:'${deck.id}'};render()">Ulangi</button>
+          <button class="ghost-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">Kembali</button>
+        </div>
+      </div>`;
+    return;
+  }
+  const card = currentScreen.cards[i];
+  const dir = settings.direction;
+  const prompt = dir==="nl-id" ? card.dutch : card.indo;
+  const target = dir==="nl-id" ? card.indo : card.dutch;
+  const targetLang = dir==="nl-id" ? "Indonesia" : "Belanda";
+
+  app.innerHTML = `
+    <div class="nav">
+      <button class="back-btn" id="backBtn">←</button>
+      <div class="nav-title">${escHtml(deck.title)} · Tulis</div>
+    </div>
+    <div class="mode-screen">
+      <div class="topbar-mode">
+        <div class="progress-bar"><div class="progress-fill" style="width:${(i/total)*100}%"></div></div>
+        <div class="progress-text">${i+1}/${total}</div>
+      </div>
+      <div class="learn-prompt">
+        <div class="small">${dir==="nl-id"?"🇳🇱 Belanda":"🇮🇩 Indonesia"} → ketik dalam ${targetLang}</div>
+        <div class="word">${escHtml(prompt)}</div>
+        <button class="speak-btn" id="speakBtn">🔊</button>
+      </div>
+      <div class="learn-typing" id="typingWrap">
+        <input id="typeInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Ketik dalam ${targetLang}..." />
+        <div class="learn-feedback" id="feedback"></div>
+        <button class="primary-btn" id="checkBtn">${currentScreen.checked?"Lanjut":"Periksa"}</button>
+        <button class="ghost-btn" id="skipBtn">Lewati</button>
+      </div>
+    </div>
+  `;
+  const input = document.getElementById("typeInput");
+  const fb = document.getElementById("feedback");
+  const wrap = document.getElementById("typingWrap");
+  const checkBtn = document.getElementById("checkBtn");
+
+  document.getElementById("backBtn").addEventListener("click",()=>{
+    currentScreen.cards=null;
+    go({name:"deck",deckId:deck.id});
+  });
+  document.getElementById("speakBtn").addEventListener("click",()=>speak(card.dutch));
+
+  function next(){
+    currentScreen.idx++;
+    currentScreen.checked=false;
+    render();
+  }
+  function check(){
+    if(currentScreen.checked) return next();
+    const v = input.value;
+    const correct = answersMatch(v, target);
+    currentScreen.checked = true;
+    if(correct){
+      wrap.classList.add("correct");
+      fb.textContent = "Tepat sekali! ✓";
+      fb.className = "learn-feedback correct show";
+      currentScreen.right++;
+      markLearned(deck.id, card.id, true);
+      checkBtn.textContent = "Lanjut →";
+      setTimeout(next, 900);
+    } else {
+      wrap.classList.add("wrong");
+      fb.innerHTML = `Jawaban benar: <strong>${escHtml(target)}</strong>`;
+      fb.className = "learn-feedback wrong show";
+      currentScreen.wrong++;
+      checkBtn.textContent = "Lanjut →";
+    }
+  }
+  checkBtn.addEventListener("click",check);
+  input.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); });
+  document.getElementById("skipBtn").addEventListener("click",next);
+  setTimeout(()=>input.focus(),100);
+}
+
+/* ----- TEST MODE ----- */
+function renderTest(){
+  const deck = DECKS.find(d=>d.id===currentScreen.deckId);
+  if(!deck) return go({name:"home"});
+
+  if(!currentScreen.questions){
+    const N = Math.min(10, deck.cards.length);
+    const sample = shuffle(deck.cards).slice(0, N);
+    const types = ["mc","tf","write"];
+    currentScreen.questions = sample.map(c=>{
+      const t = types[Math.floor(Math.random()*types.length)];
+      return {card:c, type:t, answered:false, correct:false, userAnswer:""};
+    });
+    currentScreen.qIdx = 0;
+  }
+
+  const qIdx = currentScreen.qIdx;
+  const total = currentScreen.questions.length;
+
+  if(qIdx >= total){
+    // results
+    const right = currentScreen.questions.filter(q=>q.correct).length;
+    const wrong = currentScreen.questions.filter(q=>!q.correct);
+    const p = getDeckProgress(deck.id);
+    if(!p.best.testScore || right > p.best.testScore){
+      p.best.testScore = right;
+      saveProgress(progress);
+    }
+    const dir = settings.direction;
+    app.innerHTML = `
+      <div class="nav"><button class="back-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">←</button><div class="nav-title">Hasil tes</div></div>
+      <div class="mode-screen">
+        <div class="test-results">
+          <div class="score">${right}</div>
+          <div class="out-of">/ ${total}</div>
+          <div class="summary">${right===total?"Sempurna! 🏆":right>=total*0.8?"Bagus sekali! 🎉":right>=total*0.5?"Lumayan, terus latihan 💪":"Perlu lebih banyak latihan 📚"}</div>
+        </div>
+        ${wrong.length?`<div class="section-title" style="padding:0;margin:12px 0 8px"><span>Untuk dipelajari</span></div>`:""}
+        ${wrong.map(q=>{
+          const prompt = dir==="nl-id"?q.card.dutch:q.card.indo;
+          const target = dir==="nl-id"?q.card.indo:q.card.dutch;
+          return `<div class="review-item">
+            <div class="q">${escHtml(prompt)}</div>
+            <div class="a">${q.userAnswer?`<strike>${escHtml(q.userAnswer)}</strike>`:""}<span class="right">${escHtml(target)}</span></div>
+          </div>`;
+        }).join("")}
+        <div class="done-actions" style="margin-top:18px">
+          <button class="primary-btn" onclick="currentScreen={name:'test',deckId:'${deck.id}'};render()">Tes lagi</button>
+          <button class="ghost-btn" onclick="currentScreen={};go({name:'deck',deckId:'${deck.id}'})">Kembali</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const q = currentScreen.questions[qIdx];
+  const card = q.card;
+  const dir = settings.direction;
+  const prompt = dir==="nl-id" ? card.dutch : card.indo;
+  const target = dir==="nl-id" ? card.indo : card.dutch;
+
+  let body = "";
+  if(q.type === "mc"){
+    const others = shuffle(deck.cards.filter(c=>c.id!==card.id)).slice(0,3);
+    const opts = shuffle([card,...others]);
+    q._opts = opts;
+    body = `
+      <div class="learn-options">
+        ${opts.map((c,n)=>{
+          const txt = dir==="nl-id" ? c.indo : c.dutch;
+          return `<button class="learn-option" data-cid="${c.id}"><span class="num">${n+1}</span><span>${escHtml(txt)}</span></button>`;
+        }).join("")}
+      </div>
+    `;
+  } else if(q.type === "tf"){
+    const isTrueAnswer = Math.random() < 0.5;
+    let shown;
+    if(isTrueAnswer){
+      shown = target;
+    } else {
+      const other = shuffle(deck.cards.filter(c=>c.id!==card.id))[0];
+      shown = dir==="nl-id" ? other.indo : other.dutch;
+    }
+    q._tfTrue = isTrueAnswer;
+    q._tfShown = shown;
+    body = `
+      <div style="background:var(--surface);padding:18px;border-radius:14px;text-align:center;font-size:18px;font-weight:700;margin-bottom:14px;box-shadow:var(--shadow)">
+        ${escHtml(shown)}
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="fc-btn no" data-tf="false" style="flex:1">✗ Salah</button>
+        <button class="fc-btn yes" data-tf="true" style="flex:1">✓ Benar</button>
+      </div>
+    `;
+  } else {
+    body = `
+      <div class="learn-typing">
+        <input id="typeInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Ketik jawaban..." />
+        <button class="primary-btn" id="checkBtn">Kirim jawaban</button>
+      </div>
+    `;
+  }
+
+  app.innerHTML = `
+    <div class="nav">
+      <button class="back-btn" id="backBtn">←</button>
+      <div class="nav-title">${escHtml(deck.title)} · Tes</div>
+    </div>
+    <div class="mode-screen">
+      <div class="topbar-mode">
+        <div class="progress-bar"><div class="progress-fill" style="width:${(qIdx/total)*100}%"></div></div>
+        <div class="progress-text">${qIdx+1}/${total}</div>
+      </div>
+      <div class="test-q">
+        <div class="test-q-num">Soal ${qIdx+1} · ${q.type==="mc"?"Pilihan ganda":q.type==="tf"?"Benar / Salah":"Tulis"}</div>
+        <div class="test-q-prompt">
+          ${q.type==="tf"?`Apakah ini terjemahan yang benar untuk: <em>${escHtml(prompt)}</em>?`:`Terjemahkan: <strong>${escHtml(prompt)}</strong>`}
+        </div>
+        ${body}
+      </div>
+    </div>
+  `;
+
+  document.getElementById("backBtn").addEventListener("click",()=>{
+    currentScreen.questions = null;
+    go({name:"deck",deckId:deck.id});
+  });
+
+  function done(correct, userAnswer){
+    q.answered = true;
+    q.correct = correct;
+    q.userAnswer = userAnswer || "";
+    if(correct) markLearned(deck.id, card.id, true);
+    setTimeout(()=>{
+      currentScreen.qIdx++;
+      render();
+    }, correct ? 500 : 1100);
+  }
+
+  if(q.type==="mc"){
+    document.querySelectorAll(".learn-option").forEach(el=>{
+      el.addEventListener("click",()=>{
+        if(q.answered) return;
+        const correct = el.dataset.cid === card.id;
+        document.querySelectorAll(".learn-option").forEach(x=>{
+          if(x.dataset.cid === card.id) x.classList.add("correct");
+          else if(x===el && !correct) x.classList.add("wrong");
+        });
+        const txt = el.querySelector("span:nth-child(2)").textContent;
+        done(correct, txt);
+      });
+    });
+  } else if(q.type==="tf"){
+    document.querySelectorAll("[data-tf]").forEach(el=>{
+      el.addEventListener("click",()=>{
+        if(q.answered) return;
+        const choice = el.dataset.tf === "true";
+        const correct = choice === q._tfTrue;
+        el.style.opacity = "0.6";
+        done(correct, choice?"Benar":"Salah");
+      });
+    });
+  } else {
+    const input = document.getElementById("typeInput");
+    const check = ()=>{
+      if(q.answered) return;
+      const v = input.value;
+      const correct = answersMatch(v, target);
+      done(correct, v);
+    };
+    document.getElementById("checkBtn").addEventListener("click",check);
+    input.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); });
+    setTimeout(()=>input.focus(),100);
+  }
+}
+
+/* ----- DRAWER ----- */
+function renderDrawer(){
+  return `
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer" id="drawer">
+      <div class="drawer-handle"></div>
+      <h3>Pengaturan</h3>
+      <div class="setting-row">
+        <div>
+          <div class="label">Mode gelap</div>
+          <div class="desc">Tampilan gelap untuk malam hari</div>
+        </div>
+        <button class="toggle ${settings.dark?"on":""}" id="toggleDark"></button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="label">Arah belajar</div>
+          <div class="desc">Bahasa yang ditampilkan di depan</div>
+        </div>
+        <button class="ghost-btn" style="width:auto;margin:0;padding:8px 14px;font-size:13px" id="toggleDir">${settings.direction==="nl-id"?"🇳🇱 → 🇮🇩":"🇮🇩 → 🇳🇱"}</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="label">Acak urutan</div>
+          <div class="desc">Sajikan kartu dalam urutan acak</div>
+        </div>
+        <button class="toggle ${settings.shuffle?"on":""}" id="toggleShuffle"></button>
+      </div>
+      <div class="setting-row" style="border-bottom:none">
+        <div>
+          <div class="label">Reset progres</div>
+          <div class="desc">Hapus semua data hafalan & favorit</div>
+        </div>
+        <button class="ghost-btn" style="width:auto;margin:0;padding:8px 14px;font-size:13px;color:var(--danger)" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  `;
+}
+function wireDrawer(){
+  const btn = document.getElementById("settingsBtn");
+  const drawer = document.getElementById("drawer");
+  const overlay = document.getElementById("drawerOverlay");
+  if(!btn) return;
+  const open = ()=>{ drawer.classList.add("show"); overlay.classList.add("show"); };
+  const close = ()=>{ drawer.classList.remove("show"); overlay.classList.remove("show"); };
+  btn.addEventListener("click",open);
+  overlay.addEventListener("click",close);
+  document.getElementById("toggleDark").addEventListener("click",()=>{
+    settings.dark = !settings.dark;
+    saveSettings(settings); applyTheme(); renderHome();
+  });
+  document.getElementById("toggleDir").addEventListener("click",()=>{
+    settings.direction = settings.direction==="nl-id" ? "id-nl" : "nl-id";
+    saveSettings(settings); renderHome();
+  });
+  document.getElementById("toggleShuffle").addEventListener("click",()=>{
+    settings.shuffle = !settings.shuffle;
+    saveSettings(settings); renderHome();
+  });
+  document.getElementById("resetBtn").addEventListener("click",()=>{
+    if(confirm("Hapus semua progres? Tindakan ini tidak bisa dibatalkan.")){
+      progress = {};
+      saveProgress(progress);
+      renderHome();
+    }
+  });
+}
+
+/* Init */
+render();
+
+// Prevent accidental zoom on iOS
+document.addEventListener("gesturestart",e=>e.preventDefault());
+
+// Expose for inline handlers
+window.go = go;
+window.render = render;
+window.currentScreen = currentScreen;
+Object.defineProperty(window,"currentScreen",{
+  get:()=>currentScreen,
+  set:v=>{ currentScreen = v; }
+});
+</script>
 </body>
 </html>
